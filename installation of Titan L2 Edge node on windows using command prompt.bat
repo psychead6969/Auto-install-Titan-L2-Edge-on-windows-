@@ -64,7 +64,7 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Step 5: Extract the ZIP file and check for errors
+REM Step 5: Extract the ZIP file and check for errors (No deletion after extraction)
 color %info_color%
 echo Extracting Titan Edge ZIP file...
 powershell -Command "Expand-Archive -Path 'C:\titan-edge.zip' -DestinationPath 'C:\titan-edge' -Force"
@@ -75,15 +75,19 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Step 6: Move goworkerd.dll to System32
+REM Step 6: Move goworkerd.dll to System32 (skip if it exists)
 color %info_color%
 echo Moving goworkerd.dll to C:\Windows\System32...
-move /y "C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64\goworkerd.dll" "C:\Windows\System32"
-if %errorlevel% neq 0 (
-    color %error_color%
-    echo [ERROR] Failed to move goworkerd.dll. Exiting...
-    pause
-    exit /b 1
+if not exist "C:\Windows\System32\goworkerd.dll" (
+    move /y "C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64\goworkerd.dll" "C:\Windows\System32"
+    if %errorlevel% neq 0 (
+        color %error_color%
+        echo [ERROR] Failed to move goworkerd.dll. Exiting...
+        pause
+        exit /b 1
+    )
+) else (
+    echo [INFO] goworkerd.dll already exists in System32. Skipping move.
 )
 
 REM Step 7: Start the Titan Edge daemon
@@ -107,15 +111,16 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Step 9: Clean up extracted files, but only if they exist
+REM Step 9: Skip cleanup if Titan Edge directory already exists
 color %info_color%
 echo Checking if Titan Edge directory exists before cleanup...
 if exist "C:\titan-edge" (
+    echo Skipping cleanup. Titan Edge files are already present.
+) else (
+    REM Cleanup if extraction was successful and files don't exist
     echo Cleaning up extracted files...
     rmdir /s /q "C:\titan-edge"
     del "C:\titan-edge.zip"
-) else (
-    echo [INFO] No Titan Edge directory found, skipping cleanup.
 )
 
 color %success_color%
