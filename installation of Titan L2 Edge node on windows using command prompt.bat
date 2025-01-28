@@ -32,7 +32,16 @@ if %errorlevel% neq 0 (
     echo Chocolatey is already installed.
 )
 
-REM Step 2: Install curl using Chocolatey
+REM Step 2: Restart Command Prompt after Chocolatey installation to apply changes
+echo.
+echo Restarting Command Prompt to apply changes...
+timeout /t 3 /nobreak >nul
+start cmd.exe /K "%~f0"   REM Re-run the script after restart
+exit
+
+REM --- The following steps will execute after the Command Prompt is restarted ---
+
+REM Step 3: Install curl using Chocolatey
 echo Installing curl...
 choco install curl -y
 if %errorlevel% neq 0 (
@@ -42,7 +51,20 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Step 3: Download the Titan Edge ZIP file
+REM Step 4: Check if curl is installed successfully
+echo Checking if curl was installed successfully...
+curl --version >nul 2>&1
+if %errorlevel% neq 0 (
+    color %error_color%
+    echo [ERROR] curl is not recognized after installation. Exiting...
+    pause
+    exit /b 1
+) else (
+    color %info_color%
+    echo curl installed successfully.
+)
+
+REM Step 5: Download the Titan Edge ZIP file
 color %info_color%
 echo Downloading Titan Edge ZIP file...
 curl -L -o "C:\titan-edge.zip" "https://www.dropbox.com/scl/fi/82nsa6y23y6wc24yv1yve/titan-edge_v0.1.20_246b9dd_widnows_amd64.tar.zip?rlkey=6y2z6n0t8ms0o6odxgodue87p&dl=1"
@@ -53,7 +75,7 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Step 4: Extract the ZIP file
+REM Step 6: Extract the ZIP file
 color %info_color%
 echo Extracting Titan Edge ZIP file...
 powershell -Command "Expand-Archive -Path 'C:\titan-edge.zip' -DestinationPath 'C:\titan-edge' -Force"
@@ -64,7 +86,7 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Step 5: Move goworkerd.dll to System32
+REM Step 7: Move goworkerd.dll to System32
 color %info_color%
 echo Moving goworkerd.dll to C:\Windows\System32...
 move /y "C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64\goworkerd.dll" "C:\Windows\System32"
@@ -75,12 +97,12 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Step 6: Add the Titan Edge path to the system PATH environment variable
+REM Step 8: Add the Titan Edge path to the system PATH environment variable
 color %info_color%
 echo Adding Titan Edge to system PATH...
 setx PATH "%PATH%;C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64"
 
-REM Step 7: Prompt the user to restart the Command Prompt or the system
+REM Step 9: Prompt the user to restart the Command Prompt or the system
 color %prompt_color%
 echo.
 echo ================================
@@ -94,14 +116,16 @@ if /I "%restart_choice%" == "Y" (
     color %success_color%
     echo Restarting Command Prompt...
     timeout /t 2 /nobreak >nul
-    start cmd.exe /K
+    start cmd.exe /K "C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64\titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0"
     exit
 ) else (
     color %info_color%
     echo You can manually restart the Command Prompt later for the changes to take effect.
 )
 
-REM Step 8: Start the Titan Edge daemon
+REM Step 10: After Restart, Start the Titan Edge daemon
+REM We wait for the restart to complete, so it executes the daemon command.
+
 color %success_color%
 echo Starting Titan Edge daemon...
 titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0
@@ -112,7 +136,7 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Step 9: Prompt for identity code and bind the node
+REM Step 11: Prompt for identity code and bind the node
 color %prompt_color%
 set /p identity_code="Enter your identity code (hash): "
 color %success_color%
@@ -125,7 +149,7 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Step 10: Clean up extracted files
+REM Step 12: Clean up extracted files
 color %info_color%
 echo Cleaning up extracted files...
 rmdir /s /q "C:\titan-edge"
