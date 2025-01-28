@@ -63,7 +63,18 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Step 6: Start the Titan Edge daemon
+REM Step 6: Set PATH to include Titan Edge directory
+color %info_color%
+echo Adding Titan Edge directory to PATH...
+setx PATH "%PATH%;C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64"
+if %errorlevel% neq 0 (
+    color %error_color%
+    echo [ERROR] Failed to update PATH. Exiting...
+    pause
+    exit /b 1
+)
+
+REM Step 7: Start the Titan Edge daemon
 color %success_color%
 echo Starting Titan Edge daemon...
 titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0
@@ -74,7 +85,7 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Step 7: Prompt for identity code and bind the node
+REM Step 8: Prompt for identity code and bind the node
 color %prompt_color%
 set /p identity_code="Enter your identity code (hash): "
 color %success_color%
@@ -87,7 +98,7 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Step 8: Clean up extracted files
+REM Step 9: Clean up extracted files
 color %info_color%
 echo Cleaning up extracted files...
 rmdir /s /q "C:\titan-edge"
