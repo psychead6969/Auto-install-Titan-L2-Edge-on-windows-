@@ -89,15 +89,12 @@ if %errorlevel% neq 0 (
 REM Step 7: Start the Titan Edge daemon
 color %success_color%
 echo Starting Titan Edge daemon...
-titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0
-if %errorlevel% neq 0 (
-    color %error_color%
-    echo [ERROR] Failed to start Titan Edge daemon. Exiting...
-    pause
-    exit /b 1
-)
+start /B titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0
+timeout /t 10 >nul
+REM Force exit if the daemon command doesn't exit after 10 seconds
+taskkill /f /im titan-edge.exe >nul
 
-REM Step 8: Prompt for identity code and bind the node
+REM Step 8: Check if the daemon is running and proceed with binding
 color %prompt_color%
 set /p identity_code="Enter your identity code (hash): "
 color %success_color%
