@@ -13,14 +13,22 @@ set error_color=0C
 set prompt_color=0E
 set info_color=07
 
-REM Step 1: Install curl using winget
-echo Installing curl...
-winget install -e --id Curl.Curl --silent
+REM Step 1: Check if curl is installed
+echo Checking if curl is installed...
+curl --version >nul 2>&1
 if %errorlevel% neq 0 (
-    color %error_color%
-    echo [ERROR] Failed to install curl. Please check your system configuration.
-    pause
-    exit /b 1
+    color %info_color%
+    echo curl is not installed. Installing curl...
+    winget install --id Curl.Curl
+    if %errorlevel% neq 0 (
+        color %error_color%
+        echo [ERROR] Failed to install curl. Please check your system configuration.
+        pause
+        exit /b 1
+    )
+) else (
+    color %info_color%
+    echo curl is already installed.
 )
 
 REM Step 2: Download the Titan Edge ZIP file
