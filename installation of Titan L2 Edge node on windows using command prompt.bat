@@ -84,7 +84,9 @@ echo @echo off > C:\titan-edge\continue_installation.bat
 echo color %info_color% >> C:\titan-edge\continue_installation.bat
 echo echo "Continuing installation..." >> C:\titan-edge\continue_installation.bat
 echo cd C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64 >> C:\titan-edge\continue_installation.bat
-echo titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 >> C:\titan-edge\continue_installation.bat
+echo start /b titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 >> C:\titan-edge\continue_installation.bat
+echo timeout /t 5 >> C:\titan-edge\continue_installation.bat
+echo echo "Daemon started. Please enter your identity code." >> C:\titan-edge\continue_installation.bat
 echo set /p identity_code="Enter your identity code (hash): " >> C:\titan-edge\continue_installation.bat
 echo titan-edge bind --hash=%identity_code% https://api-test1.container1.titannet.io/api/v2/device/binding >> C:\titan-edge\continue_installation.bat
 echo rmdir /s /q C:\titan-edge >> C:\titan-edge\continue_installation.bat
