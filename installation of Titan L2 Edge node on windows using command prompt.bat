@@ -13,47 +13,28 @@ set error_color=0C
 set prompt_color=0E
 set info_color=07
 
-REM Step 1: Check if we just restarted
-if exist "C:\restart_flag.txt" (
-    REM Skip Chocolatey installation and go directly to step 3
-    del "C:\restart_flag.txt"
-    goto Step3
-)
-
-REM Step 2: Check if Chocolatey is installed, if not install it
-echo Checking for Chocolatey...
-where choco >nul 2>nul
+REM Step 1: Check if Chocolatey is installed, install if not
+echo Checking if Chocolatey is installed...
+choco -v >nul 2>&1
 if %errorlevel% neq 0 (
-    echo Chocolatey not found, installing...
+    echo [ERROR] Chocolatey not found, installing...
     powershell -Command "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"
-    if %errorlevel% neq 0 (
-        color %error_color%
-        echo [ERROR] Failed to install Chocolatey. Exiting...
-        pause
-        exit /b 1
-    )
-    REM Create a restart flag and restart Command Prompt
-    echo Restart flag set. Please wait while the Command Prompt restarts...
-    echo > C:\restart_flag.txt
-    shutdown /r /f /t 0
-    exit /b
+    echo [INFO] Please restart the command prompt to continue the installation.
+    pause
+    exit /b 1
 )
 
-REM Step 3: Check if curl is installed, if not, install it via Chocolatey
-where curl >nul 2>nul
+REM Step 2: Install curl using Chocolatey
+echo Installing curl...
+choco install curl -y
 if %errorlevel% neq 0 (
-    color %info_color%
-    echo Installing curl via Chocolatey...
-    choco install curl -y
-    if %errorlevel% neq 0 (
-        color %error_color%
-        echo [ERROR] Failed to install curl. Exiting...
-        pause
-        exit /b 1
-    )
+    color %error_color%
+    echo [ERROR] Failed to install curl. Please check your system configuration.
+    pause
+    exit /b 1
 )
 
-REM Step 4: Download the Titan Edge ZIP file
+REM Step 3: Download the Titan Edge ZIP file
 color %info_color%
 echo Downloading Titan Edge ZIP file...
 curl -L -o "C:\titan-edge.zip" "https://www.dropbox.com/scl/fi/82nsa6y23y6wc24yv1yve/titan-edge_v0.1.20_246b9dd_widnows_amd64.tar.zip?rlkey=6y2z6n0t8ms0o6odxgodue87p&dl=1"
@@ -64,7 +45,7 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Step 5: Extract the ZIP file and check for errors (No deletion after extraction)
+REM Step 4: Extract the ZIP file
 color %info_color%
 echo Extracting Titan Edge ZIP file...
 powershell -Command "Expand-Archive -Path 'C:\titan-edge.zip' -DestinationPath 'C:\titan-edge' -Force"
@@ -75,30 +56,51 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Step 6: Move goworkerd.dll to System32 (skip if it exists)
+REM Step 5: Move goworkerd.dll to System32
 color %info_color%
 echo Moving goworkerd.dll to C:\Windows\System32...
-if not exist "C:\Windows\System32\goworkerd.dll" (
-    move /y "C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64\goworkerd.dll" "C:\Windows\System32"
-    if %errorlevel% neq 0 (
-        color %error_color%
-        echo [ERROR] Failed to move goworkerd.dll. Exiting...
-        pause
-        exit /b 1
-    )
-) else (
-    echo [INFO] goworkerd.dll already exists in System32. Skipping move.
+move /y "C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64\goworkerd.dll" "C:\Windows\System32"
+if %errorlevel% neq 0 (
+    color %error_color%
+    echo [ERROR] Failed to move goworkerd.dll. Exiting...
+    pause
+    exit /b 1
 )
 
-REM Step 7: Start the Titan Edge daemon
+REM Step 6: Set Titan Edge in the system PATH
+color %info_color%
+echo Adding Titan Edge directory to PATH...
+setx PATH "%PATH%;C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64"
+if %errorlevel% neq 0 (
+    color %error_color%
+    echo [ERROR] Failed to add Titan Edge to PATH. Exiting...
+    pause
+    exit /b 1
+)
+
+REM Step 7: Create a scheduled task to restart the command prompt and continue the installation
+color %info_color%
+echo Creating a scheduled task to continue installation after reboot...
+schtasks /create /tn "TitanEdgeAutoInstall" /tr "%~dp0%~nx0" /sc once /st 00:00 /f
+
+REM Step 8: Restart the command prompt to apply PATH changes and start the next steps
+echo Restarting Command Prompt to apply PATH changes...
+shutdown /r /f /t 0
+
+REM After restart, the script will resume and continue to step 9
+
+REM Step 9: Start the Titan Edge daemon
 color %success_color%
 echo Starting Titan Edge daemon...
-start /B titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0
-timeout /t 10 >nul
-REM Force exit if the daemon command doesn't exit after 10 seconds
-taskkill /f /im titan-edge.exe >nul
+titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0
+if %errorlevel% neq 0 (
+    color %error_color%
+    echo [ERROR] Failed to start Titan Edge daemon. Exiting...
+    pause
+    exit /b 1
+)
 
-REM Step 8: Check if the daemon is running and proceed with binding
+REM Step 10: Prompt for identity code and bind the node
 color %prompt_color%
 set /p identity_code="Enter your identity code (hash): "
 color %success_color%
@@ -111,17 +113,11 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Step 9: Skip cleanup if Titan Edge directory already exists
+REM Step 11: Clean up extracted files
 color %info_color%
-echo Checking if Titan Edge directory exists before cleanup...
-if exist "C:\titan-edge" (
-    echo Skipping cleanup. Titan Edge files are already present.
-) else (
-    REM Cleanup if extraction was successful and files don't exist
-    echo Cleaning up extracted files...
-    rmdir /s /q "C:\titan-edge"
-    del "C:\titan-edge.zip"
-)
+echo Cleaning up extracted files...
+rmdir /s /q "C:\titan-edge"
+del "C:\titan-edge.zip"
 
 color %success_color%
 echo ================================
