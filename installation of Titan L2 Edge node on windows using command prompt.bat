@@ -64,7 +64,7 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Step 5: Extract the ZIP file
+REM Step 5: Extract the ZIP file and check for errors
 color %info_color%
 echo Extracting Titan Edge ZIP file...
 powershell -Command "Expand-Archive -Path 'C:\titan-edge.zip' -DestinationPath 'C:\titan-edge' -Force"
@@ -107,11 +107,16 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Step 9: Clean up extracted files
+REM Step 9: Clean up extracted files, but only if they exist
 color %info_color%
-echo Cleaning up extracted files...
-rmdir /s /q "C:\titan-edge"
-del "C:\titan-edge.zip"
+echo Checking if Titan Edge directory exists before cleanup...
+if exist "C:\titan-edge" (
+    echo Cleaning up extracted files...
+    rmdir /s /q "C:\titan-edge"
+    del "C:\titan-edge.zip"
+) else (
+    echo [INFO] No Titan Edge directory found, skipping cleanup.
+)
 
 color %success_color%
 echo ================================
