@@ -15,7 +15,7 @@ set info_color=07
 
 REM Step 1: Install curl using winget
 echo Installing curl...
-winget install --id Curl.Curl -e --silent
+winget install -e --id Curl.Curl --silent
 if %errorlevel% neq 0 (
     color %error_color%
     echo [ERROR] Failed to install curl. Please check your system configuration.
