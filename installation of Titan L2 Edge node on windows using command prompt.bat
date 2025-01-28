@@ -19,7 +19,7 @@ choco -v >nul 2>&1
 if %errorlevel% neq 0 (
     echo [ERROR] Chocolatey not found, installing...
     powershell -Command "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"
-    echo [INFO] Please restart the command prompt to continue the installation.
+    echo [INFO] Chocolatey installation complete. Restarting Command Prompt...
     pause
     exit /b 1
 )
@@ -78,49 +78,22 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Step 7: Create a scheduled task to restart the command prompt and continue the installation
-color %info_color%
-echo Creating a scheduled task to continue installation after reboot...
-schtasks /create /tn "TitanEdgeAutoInstall" /tr "%~dp0%~nx0" /sc once /st 00:00 /f
+REM Step 7: Create a new batch file with the remaining steps
+echo Creating a temporary batch file to continue the installation...
+echo @echo off > C:\titan-edge\continue_installation.bat
+echo color %info_color% >> C:\titan-edge\continue_installation.bat
+echo echo "Continuing installation..." >> C:\titan-edge\continue_installation.bat
+echo cd C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64 >> C:\titan-edge\continue_installation.bat
+echo titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 >> C:\titan-edge\continue_installation.bat
+echo set /p identity_code="Enter your identity code (hash): " >> C:\titan-edge\continue_installation.bat
+echo titan-edge bind --hash=%identity_code% https://api-test1.container1.titannet.io/api/v2/device/binding >> C:\titan-edge\continue_installation.bat
+echo rmdir /s /q C:\titan-edge >> C:\titan-edge\continue_installation.bat
+echo del C:\titan-edge.zip >> C:\titan-edge\continue_installation.bat
+echo echo Installation complete! >> C:\titan-edge\continue_installation.bat
 
-REM Step 8: Restart the command prompt to apply PATH changes and start the next steps
-echo Restarting Command Prompt to apply PATH changes...
-shutdown /r /f /t 0
+REM Step 8: Restart the Command Prompt to apply PATH changes
+echo Restarting the Command Prompt to apply changes...
+start /b cmd /c C:\titan-edge\continue_installation.bat
 
-REM After restart, the script will resume and continue to step 9
-
-REM Step 9: Start the Titan Edge daemon
-color %success_color%
-echo Starting Titan Edge daemon...
-titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0
-if %errorlevel% neq 0 (
-    color %error_color%
-    echo [ERROR] Failed to start Titan Edge daemon. Exiting...
-    pause
-    exit /b 1
-)
-
-REM Step 10: Prompt for identity code and bind the node
-color %prompt_color%
-set /p identity_code="Enter your identity code (hash): "
-color %success_color%
-echo Binding Titan Edge node with the provided identity code...
-titan-edge bind --hash=%identity_code% https://api-test1.container1.titannet.io/api/v2/device/binding
-if %errorlevel% neq 0 (
-    color %error_color%
-    echo [ERROR] Failed to bind Titan Edge node. Please check the identity code or connection.
-    pause
-    exit /b 1
-)
-
-REM Step 11: Clean up extracted files
-color %info_color%
-echo Cleaning up extracted files...
-rmdir /s /q "C:\titan-edge"
-del "C:\titan-edge.zip"
-
-color %success_color%
-echo ================================
-echo Titan Edge installation complete!
-echo ================================
-pause
+REM Exit the current session so the new session starts with the correct environment
+exit
