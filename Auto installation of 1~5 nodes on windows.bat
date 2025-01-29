@@ -91,58 +91,33 @@ if %num_nodes% geq 5 (
     move /y "%node5_dir%\goworkerd.dll" "C:\Windows\System32"
 )
 
-REM Step 5: Set Titan Edge in the system PATH for each node
-color %info_color%
-if %num_nodes% geq 1 (
-    echo [INFO] Adding Titan Edge Node 1 directory to PATH...
-    setx PATH "%PATH%;%node1_dir%"
-)
-if %num_nodes% geq 2 (
-    echo [INFO] Adding Titan Edge Node 2 directory to PATH...
-    setx PATH "%PATH%;%node2_dir%"
-)
-if %num_nodes% geq 3 (
-    echo [INFO] Adding Titan Edge Node 3 directory to PATH...
-    setx PATH "%PATH%;%node3_dir%"
-)
-if %num_nodes% geq 4 (
-    echo [INFO] Adding Titan Edge Node 4 directory to PATH...
-    setx PATH "%PATH%;%node4_dir%"
-)
-if %num_nodes% geq 5 (
-    echo [INFO] Adding Titan Edge Node 5 directory to PATH...
-    setx PATH "%PATH%;%node5_dir%"
-)
-
-REM Step 6: Start Titan Edge Daemon for each node on different ports
+REM Step 5: Start Titan Edge Daemon for each node in the background
 color %info_color%
 if %num_nodes% geq 1 (
     echo [INFO] Starting Titan Edge Daemon for Node 1...
-    start cmd /k "cd %node1_dir% && titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --port 5001"
+    start /b cmd /c "cd %node1_dir% && titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --port 5001"
 )
 if %num_nodes% geq 2 (
     echo [INFO] Starting Titan Edge Daemon for Node 2...
-    start cmd /k "cd %node2_dir% && titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --port 5002"
+    start /b cmd /c "cd %node2_dir% && titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --port 5002"
 )
 if %num_nodes% geq 3 (
     echo [INFO] Starting Titan Edge Daemon for Node 3...
-    start cmd /k "cd %node3_dir% && titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --port 5003"
+    start /b cmd /c "cd %node3_dir% && titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --port 5003"
 )
 if %num_nodes% geq 4 (
     echo [INFO] Starting Titan Edge Daemon for Node 4...
-    start cmd /k "cd %node4_dir% && titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --port 5004"
+    start /b cmd /c "cd %node4_dir% && titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --port 5004"
 )
 if %num_nodes% geq 5 (
     echo [INFO] Starting Titan Edge Daemon for Node 5...
-    start cmd /k "cd %node5_dir% && titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --port 5005"
+    start /b cmd /c "cd %node5_dir% && titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --port 5005"
 )
 
-REM Step 7: Request Identity Code for each node
-color %prompt_color%
-echo [INFO] Please enter your identity code to bind your nodes.
-set /p identity_code="🔹 Enter your identity code (hash): "
+REM Add a small delay between binding requests to avoid rate limiting
+timeout /t 5 /nobreak
 
-REM Step 8: Bind Nodes to Account
+REM Step 6: Bind Nodes to Account
 color %info_color%
 if %num_nodes% geq 1 (
     echo [INFO] Binding Node 1...
@@ -165,7 +140,7 @@ if %num_nodes% geq 5 (
     titan-edge bind --hash=%identity_code% https://api-test1.container1.titannet.io/api/v2/device/binding
 )
 
-REM Step 9: Success message
+REM Step 7: Success message
 color %success_color%
 echo ✅ [SUCCESS] All nodes are running and bound to your account!
 
