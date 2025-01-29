@@ -117,7 +117,7 @@ for /l %%i in (1,1,%num_nodes%) do (
     REM Start Titan Edge Daemon in the same window
     echo [INFO] Starting Node %%i on port %port%...
     cd C:\titan-edge
-    titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --port %port%
+    start cmd /k "titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --port %port%"
     
     REM Increase port for next node
     set /a port_start+=1
