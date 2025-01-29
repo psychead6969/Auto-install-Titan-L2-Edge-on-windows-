@@ -59,16 +59,10 @@ if %errorlevel% neq 0 (
 REM Introduce a 2-second pause to slow down
 timeout /t 2 /nobreak
 
-REM Step 3: Create directories for each node and copy the files
+REM Step 3: Copy the extracted files into the same directory (no need for separate directories)
 set base_dir=C:\titan-edge
-set /a port_start=5001
-
-for /l %%i in (1,1,%num_nodes%) do (
-    set node_dir=%base_dir%-node%%i
-    echo [INFO] Creating directory for Node %%i at %node_dir%
-    mkdir "%node_dir%"
-    xcopy /e /i /h /y "%base_dir%\titan-edge_v0.1.20_246b9dd_widnows_amd64\*" "%node_dir%\"
-)
+echo [INFO] Copying extracted files to the base directory...
+xcopy /e /i /h /y "%base_dir%\titan-edge_v0.1.20_246b9dd_widnows_amd64\*" "%base_dir%\"
 
 REM Step 4: Move goworkerd.dll to System32
 echo [INFO] Moving goworkerd.dll to System32...
@@ -97,27 +91,31 @@ if %errorlevel% neq 0 (
 REM Introduce a 2-second pause to slow down
 timeout /t 2 /nobreak
 
-REM Step 6: Start each Titan Edge Daemon in background using PowerShell
+REM Step 6: Start each Titan Edge Daemon in background using PowerShell with unique ports
+set /a port_start=5001
 for /l %%i in (1,1,%num_nodes%) do (
-    set node_dir=%base_dir%-node%%i
     set port=%port_start%
     echo [INFO] Starting Node %%i on port %port%...
-    powershell -Command "Start-Process cmd -ArgumentList '/c cd %node_dir% && titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --port %port%'"
+    powershell -Command "Start-Process cmd -ArgumentList '/c cd C:\titan-edge && titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --port %port%'"
     set /a port_start+=1
 )
 
-REM Step 7: Request identity code binding (done after all nodes are started)
-color %prompt_color%
-echo [INFO] Please wait, nodes are starting. After they are ready, binding will begin.
-timeout /t 5 /nobreak
+REM Step 7: Wait for 24 seconds to ensure the daemon has started
+echo [INFO] Please wait 24 seconds for the nodes to start...
+timeout /t 24 /nobreak
 
-REM Step 8: Bind the node to account after delay (1 per node)
+REM Step 8: Request identity code binding (done after all nodes are started)
+color %prompt_color%
+echo [INFO] Nodes should be running. Now binding them to your account...
+timeout /t 2 /nobreak
+
+REM Step 9: Bind the node to account after delay (1 per node)
 for /l %%i in (1,1,%num_nodes%) do (
     echo [INFO] Binding Node %%i to account...
     powershell -Command "Start-Process cmd -ArgumentList '/c titan-edge bind --hash %identity_code% https://api-test1.container1.titannet.io/api/v2/device/binding'"
 )
 
-REM Step 9: Success message
+REM Step 10: Success message
 color %success_color%
 echo ✅ [SUCCESS] Nodes are running and bound to your account!
 
