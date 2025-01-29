@@ -42,8 +42,8 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Introduce a 2-second pause to slow down
-timeout /t 2 /nobreak
+REM Introduce a brief pause to slow down
+timeout /t 1 /nobreak
 
 REM Step 2: Extract the ZIP file
 color %info_color%
@@ -56,8 +56,8 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Introduce a 2-second pause to slow down
-timeout /t 2 /nobreak
+REM Introduce a brief pause to slow down
+timeout /t 1 /nobreak
 
 REM Step 3: Copy the extracted files into the same directory (no need for separate directories)
 set base_dir=C:\titan-edge
@@ -74,8 +74,8 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Introduce a 2-second pause to slow down
-timeout /t 2 /nobreak
+REM Introduce a brief pause to slow down
+timeout /t 1 /nobreak
 
 REM Step 5: Add Titan Edge directory to PATH
 color %info_color%
@@ -88,15 +88,29 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Introduce a 2-second pause to slow down
-timeout /t 2 /nobreak
+REM Introduce a brief pause to slow down
+timeout /t 1 /nobreak
 
-REM Step 6: Start each Titan Edge Daemon in background using PowerShell with unique ports
+REM Step 6: Start each Titan Edge Daemon in the same window
 set /a port_start=5001
 for /l %%i in (1,1,%num_nodes%) do (
     set port=%port_start%
+
+    REM Check if the port is available
+    :check_port
+    netstat -an | findstr ": %port%" > nul
+    if %errorlevel% equ 0 (
+        REM Port is already in use, try the next port
+        set /a port+=1
+        goto :check_port
+    )
+
+    REM Start Titan Edge Daemon in the same window
     echo [INFO] Starting Node %%i on port %port%...
-    powershell -Command "Start-Process cmd -ArgumentList '/c cd C:\titan-edge && titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --port %port%' -WindowStyle Hidden"
+    cd C:\titan-edge
+    titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --port %port%
+    
+    REM Increase port for next node
     set /a port_start+=1
 )
 
@@ -107,15 +121,19 @@ timeout /t 24 /nobreak
 REM Step 8: Request identity code binding (done after all nodes are started)
 color %prompt_color%
 echo [INFO] Nodes should be running. Now binding them to your account...
-timeout /t 2 /nobreak
+timeout /t 1 /nobreak
 
 REM Step 9: Bind the node to account after delay (1 per node)
 for /l %%i in (1,1,%num_nodes%) do (
     echo [INFO] Binding Node %%i to account...
-    powershell -Command "Start-Process cmd -ArgumentList '/c titan-edge bind --hash %identity_code% https://api-test1.container1.titannet.io/api/v2/device/binding' -WindowStyle Hidden"
+    titan-edge bind --hash %identity_code% https://api-test1.container1.titannet.io/api/v2/device/binding
 )
 
-REM Step 10: Success message
+REM Step 10: Check the node status
+echo [INFO] Checking node status...
+titan-edge info
+
+REM Step 11: Success message
 color %success_color%
 echo ✅ [SUCCESS] Nodes are running and bound to your account!
 
