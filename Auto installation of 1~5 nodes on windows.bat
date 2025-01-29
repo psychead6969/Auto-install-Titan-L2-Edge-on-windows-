@@ -65,9 +65,6 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Introduce a brief pause to slow down
-timeout /t 1 /nobreak
-
 REM Step 3: Copy the extracted files into the same directory (no need for separate directories)
 set base_dir=C:\titan-edge
 echo [INFO] Copying extracted files to the base directory...
@@ -83,9 +80,6 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Introduce a brief pause to slow down
-timeout /t 1 /nobreak
-
 REM Step 5: Add Titan Edge directory to PATH
 color %info_color%
 echo [INFO] Adding Titan Edge directory to PATH...
@@ -96,9 +90,6 @@ if %errorlevel% neq 0 (
     pause
     exit /b 1
 )
-
-REM Introduce a brief pause to slow down
-timeout /t 1 /nobreak
 
 REM Step 6: Start each Titan Edge Daemon in the same window
 set /a port_start=5001
@@ -117,7 +108,7 @@ for /l %%i in (1,1,%num_nodes%) do (
     REM Start Titan Edge Daemon in the same window
     echo [INFO] Starting Node %%i on port %port%...
     cd C:\titan-edge
-    start cmd /k "titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --port %port%"
+    titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --port %port%
     
     REM Increase port for next node
     set /a port_start+=1
