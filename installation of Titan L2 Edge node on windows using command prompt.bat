@@ -73,9 +73,9 @@ for /L %%i in (1,1,%node_count%) do (
     
     echo Starting Titan Edge Node %%i...
     
-    REM Ensure proper quoting around path with delayed expansion
+    REM Ensure proper quoting around path with delayed expansion (and remove --repo flag)
     setlocal enabledelayedexpansion
-    start /b "" titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --repo "!node_dir!"
+    start /b "" titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0
     endlocal
     
     REM Wait for 24 seconds to ensure daemon starts properly
