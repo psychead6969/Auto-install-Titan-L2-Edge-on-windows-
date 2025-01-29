@@ -72,11 +72,16 @@ for /L %%i in (1,1,%node_count%) do (
     if not exist "%node_dir%" mkdir "%node_dir%"
     
     echo Starting Titan Edge Node %%i...
-    start /b titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --repo "%node_dir%"
+    
+    REM Fix the repo argument by using delayed variable expansion
+    setlocal enabledelayedexpansion
+    start /b titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --repo "!node_dir!"
+    endlocal
     
     REM Wait for 24 seconds to ensure daemon starts properly
     timeout /t 24
     
+    REM Ask for identity code after daemon starts
     echo Binding Node %%i to the identity code...
     titan-edge bind --hash=%identity_code% https://api-test1.container1.titannet.io/api/v2/device/binding
     
