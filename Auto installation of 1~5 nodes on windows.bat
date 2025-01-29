@@ -30,6 +30,11 @@ if "%num_nodes%" gtr "5" (
     exit /b 1
 )
 
+REM Prompt for Identity Code
+color %prompt_color%
+echo [INFO] Please enter your identity code to bind your node.
+set /p identity_code="🔹 Enter your identity code (hash): "
+
 REM Set directories based on user input
 set node1_dir=C:\titan-edge-node1
 set node2_dir=C:\titan-edge-node2
@@ -91,7 +96,18 @@ if %num_nodes% geq 5 (
     move /y "%node5_dir%\goworkerd.dll" "C:\Windows\System32"
 )
 
-REM Step 5: Start Titan Edge Daemon for each node in the background
+REM Step 5: Add Titan Edge directory to PATH environment variable
+color %info_color%
+echo [INFO] Adding Titan Edge to system PATH...
+setx PATH "%PATH%;C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64"
+if %errorlevel% neq 0 (
+    color %error_color%
+    echo [ERROR] Failed to add Titan Edge to PATH.
+    pause
+    exit /b 1
+)
+
+REM Step 6: Start Titan Edge Daemon for each node in the background
 color %info_color%
 if %num_nodes% geq 1 (
     echo [INFO] Starting Titan Edge Daemon for Node 1...
@@ -117,7 +133,7 @@ if %num_nodes% geq 5 (
 REM Add a small delay between binding requests to avoid rate limiting
 timeout /t 5 /nobreak
 
-REM Step 6: Bind Nodes to Account
+REM Step 7: Bind Nodes to Account
 color %info_color%
 if %num_nodes% geq 1 (
     echo [INFO] Binding Node 1...
@@ -140,7 +156,7 @@ if %num_nodes% geq 5 (
     titan-edge bind --hash=%identity_code% https://api-test1.container1.titannet.io/api/v2/device/binding
 )
 
-REM Step 7: Success message
+REM Step 8: Success message
 color %success_color%
 echo ✅ [SUCCESS] All nodes are running and bound to your account!
 
