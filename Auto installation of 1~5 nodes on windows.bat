@@ -7,6 +7,14 @@ echo    🚀 Titan Edge Auto-Installation Script 🚀
 echo ====================================================
 echo.
 
+REM Check if the script is running with admin privileges
+openfiles >nul 2>&1
+if %errorlevel% neq 0 (
+    echo [ERROR] This script needs to be run as Administrator. Please right-click and select "Run as administrator".
+    pause
+    exit /b 1
+)
+
 REM Set color variables
 set success_color=0A
 set error_color=0C
@@ -31,19 +39,20 @@ REM Prompt for identity code
 echo [INFO] Please enter your identity code to bind your node.
 set /p identity_code="Enter your identity code (hash): "
 
-REM Step 1: Download Titan Edge ZIP file
-color %info_color%
-echo [INFO] Downloading Titan Edge ZIP file...
-powershell -Command "Invoke-WebRequest -Uri 'https://www.dropbox.com/scl/fi/82nsa6y23y6wc24yv1yve/titan-edge_v0.1.20_246b9dd_widnows_amd64.tar.zip?rlkey=6y2z6n0t8ms0o6odxgodue87p&dl=1' -OutFile 'C:\titan-edge.zip'"
-if %errorlevel% neq 0 (
-    color %error_color%
-    echo [ERROR] Failed to download Titan Edge ZIP file.
-    pause
-    exit /b 1
+REM Step 1: Check if Titan Edge ZIP file is already downloaded
+if exist "C:\titan-edge.zip" (
+    echo [INFO] Titan Edge ZIP file already exists, skipping download...
+) else (
+    color %info_color%
+    echo [INFO] Downloading Titan Edge ZIP file...
+    powershell -Command "Invoke-WebRequest -Uri 'https://www.dropbox.com/scl/fi/82nsa6y23y6wc24yv1yve/titan-edge_v0.1.20_246b9dd_widnows_amd64.tar.zip?rlkey=6y2z6n0t8ms0o6odxgodue87p&dl=1' -OutFile 'C:\titan-edge.zip'"
+    if %errorlevel% neq 0 (
+        color %error_color%
+        echo [ERROR] Failed to download Titan Edge ZIP file.
+        pause
+        exit /b 1
+    )
 )
-
-REM Introduce a brief pause to slow down
-timeout /t 1 /nobreak
 
 REM Step 2: Extract the ZIP file
 color %info_color%
