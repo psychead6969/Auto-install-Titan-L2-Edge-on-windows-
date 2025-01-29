@@ -69,13 +69,13 @@ REM Start and bind multiple nodes
 for /L %%i in (1,1,%node_count%) do (
     REM Create a unique directory for each node
     set "node_dir=C:\titan-edge\node_%%i"
-    if not exist "%node_dir%" mkdir "%node_dir%"
+    if not exist "!node_dir!" mkdir "!node_dir!"
     
     echo Starting Titan Edge Node %%i...
     
-    REM Fix the repo argument by using delayed variable expansion
+    REM Ensure proper quoting around path with delayed expansion
     setlocal enabledelayedexpansion
-    start /b titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --repo "!node_dir!"
+    start /b "" titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --repo "!node_dir!"
     endlocal
     
     REM Wait for 24 seconds to ensure daemon starts properly
