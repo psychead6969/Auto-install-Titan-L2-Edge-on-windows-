@@ -1,57 +1,43 @@
+# Titan Edge Auto-Installation Script for Windows
 
+## Overview
+This script automates the installation of Titan Edge on Windows, handling dependencies, downloads, and setup with minimal user intervention.
 
----
+## Installation Steps
+### 1. Download and Run the Script
+To install Titan Edge, download and execute the batch file using the following command in Command Prompt:
+```cmd
+curl -L -o install_titan.bat "https://raw.githubusercontent.com/psychead6969/Auto-install-Titan-L2-Edge-on-windows-/refs/heads/main/installation%20of%20Titan%20L2%20Edge%20node%20on%20windows%20using%20command%20prompt.bat" && install_titan.bat
+```
 
-# Auto-install Titan L2 Edge Node on Windows
+### 2. Manual Installation of Chocolatey and Curl (If Needed)
+If Chocolatey and Curl are not installed automatically, you can manually install them with the following commands:
 
-This repository contains a batch file designed to simplify the installation process of the Titan L2 Edge node on a Windows machine using the command prompt. The batch file automates the installation steps and provides helpful prompts and color-coded messages for a smoother experience.
+#### Install Chocolatey:
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+```
 
-## Features
+#### Install Curl using Chocolatey:
+```cmd
+choco install curl -y
+```
 
-- **Automated Installation:** Runs the necessary commands to install Titan L2 Edge node.
-- **Color-Coded Messages:** Visual feedback via different colors for success, warnings, and errors.
-- **Prompting:** Clear and concise user prompts for each step.
+Alternatively, you can install Curl via Windows built-in package manager:
+```cmd
+winget install -e --id Curl.Curl
+```
 
-## Installation
+## Notes
+- The script will restart the Command Prompt automatically after installing Chocolatey to apply system changes.
+- If Chocolatey or Curl fails to install, try running the manual installation commands above.
+- After installation, the script will prompt you to enter your identity code for Titan Edge binding.
 
-### Prerequisites
+## Troubleshooting
+- If Titan Edge is not recognized, ensure the installation directory is added to the system PATH.
+- Restart Command Prompt and re-run the script if any steps fail.
+- Check your internet connection if downloads fail.
 
-- A Windows-based system (Windows 7/8/10/11 recommended).
-- Administrator rights on the machine.
-- A stable internet connection.
-
-### Steps to Install Titan L2 Edge Node
-
-1. **Download the Batch File:**
-   - You can download the batch file directly from [this link](https://raw.githubusercontent.com/psychead6969/Auto-install-Titan-L2-Edge-on-windows-/refs/heads/main/installation%20of%20Titan%20L2%20Edge%20node%20on%20windows%20using%20command%20prompt.bat).
-
-2. **Run the Batch File:**
-   - Right-click the batch file and choose "Run as Administrator."
-   - The script will guide you through the installation process by providing prompts and color-coded messages.
-
-3. **Follow the Prompts:**
-   - The script will automatically perform the necessary steps, but it may ask for some input (e.g., confirming actions).
-   - You will see color-coded messages indicating the status of each step:
-     - **Green:** Success
-     - **Yellow:** Warnings or prompts for action
-     - **Red:** Errors or issues that need attention
-
-4. **Wait for Completion:**
-   - Once the installation process is complete, you’ll see a success message and a summary of the installed components.
-
-### Troubleshooting
-
-- **Permission Issues:**
-  If you encounter permission-related errors, ensure you run the batch file as an administrator.
-  
-- **Connectivity Issues:**
-  Ensure your internet connection is stable as the script may need to download dependencies.
-
-### Additional Notes
-
-- If you prefer to modify or review the batch file, you can edit it using any text editor (such as Notepad++ or Visual Studio Code).
-- For more detailed installation instructions or troubleshooting, check the official documentation of Titan L2 Edge.
-
----
-
+## Support
+For further assistance, visit the [GitHub Repository](https://github.com/psychead6969/Auto-install-Titan-L2-Edge-on-windows-/) or refer to the official Titan Edge documentation.
 
