@@ -3,14 +3,7 @@ title Titan Edge Auto Installer
 color 0E
 echo.
 echo ====================================================
-echo   ████████╗██╗████████╗ █████╗ ███╗   ██╗
-echo   ╚══██╔══╝██║╚══██╔══╝██╔══██╗████╗  ██║
-echo      ██║   ██║   ██║   ███████║██╔██╗ ██║
-echo      ██║   ██║   ██║   ██╔══██║██║╚██╗██║
-echo      ██║   ██║   ██║   ██║  ██║██║ ╚████║
-echo      ╚═╝   ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═══╝
-echo ====================================================
-echo   🚀 Titan Edge Auto-Installation Script 🚀
+echo    🚀 Titan Edge Auto-Installation Script 🚀
 echo ====================================================
 echo.
 
@@ -29,9 +22,20 @@ if %errorlevel% neq 0 (
     powershell -Command "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"
     
     color %success_color%
-    echo [SUCCESS] Chocolatey installed! Please restart Command Prompt and run this script again.
-    pause
-    exit /b 1
+    echo [SUCCESS] Chocolatey installed! The installation will continue automatically after Command Prompt restart.
+    
+    REM Create the continuation bat file to run after restart
+    echo @echo off > C:\titan-edge\continue_installation.bat
+    echo color %info_color% >> C:\titan-edge\continue_installation.bat
+    echo echo ==================================================== >> C:\titan-edge\continue_installation.bat
+    echo echo    Continuing Titan Edge Installation Step 2   >> C:\titan-edge\continue_installation.bat
+    echo echo ==================================================== >> C:\titan-edge\continue_installation.bat
+    echo start cmd /c C:\titan-edge\continue_installation.bat >> C:\titan-edge\continue_installation.bat
+    echo exit >> C:\titan-edge\continue_installation.bat
+
+    REM Step 8: Restart Command Prompt and continue installation
+    start cmd /c C:\titan-edge\continue_installation.bat
+    exit
 ) else (
     color %success_color%
     echo [SUCCESS] Chocolatey is already installed!
@@ -95,11 +99,11 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Step 7: Create a continuation script to run after restart
+REM Step 7: Create a continuation script for running the daemon
 echo @echo off > C:\titan-edge\continue_installation.bat
 echo color %info_color% >> C:\titan-edge\continue_installation.bat
 echo echo ==================================================== >> C:\titan-edge\continue_installation.bat
-echo echo    Resuming Titan Edge Installation After Restart  >> C:\titan-edge\continue_installation.bat
+echo echo    Starting Titan Edge Daemon and Binding Node    >> C:\titan-edge\continue_installation.bat
 echo echo ==================================================== >> C:\titan-edge\continue_installation.bat
 echo cd C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64 >> C:\titan-edge\continue_installation.bat
 echo start cmd /k "titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0" >> C:\titan-edge\continue_installation.bat
@@ -109,12 +113,10 @@ echo set /p identity_code="🔹 Enter your identity code (hash): " >> C:\titan-e
 echo titan-edge bind --hash=%%identity_code%% https://api-test1.container1.titannet.io/api/v2/device/binding >> C:\titan-edge\continue_installation.bat
 echo color %success_color% >> C:\titan-edge\continue_installation.bat
 echo echo ✅ [SUCCESS] Node is running and bound to your account! >> C:\titan-edge\continue_installation.bat
-echo pause >> C:\titan-edge\continue_installation.bat
+echo exit >> C:\titan-edge\continue_installation.bat
 
-REM Step 8: Restart Command Prompt and continue installation
+REM Step 8: Restarting Command Prompt and continue installation
 color %info_color%
-echo [INFO] Restarting Command Prompt...
+echo [INFO] Restarting Command Prompt and continuing installation...
 start cmd /c C:\titan-edge\continue_installation.bat
-
-REM Exit the current session so the new session starts with the correct environment
 exit
