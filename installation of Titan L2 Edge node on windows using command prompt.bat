@@ -3,7 +3,7 @@ title Titan Edge Auto Installer
 color 0E
 echo.
 echo ====================================================
-echo    🚀 Titan Edge Auto-Installation Script 🚀
+echo     Titan Edge Auto-Installation Script 
 echo ====================================================
 echo.
 
