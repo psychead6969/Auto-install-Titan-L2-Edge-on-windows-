@@ -5,7 +5,14 @@ This script automates the installation of Titan Edge on Windows, handling depend
 
 ## Installation Steps
 ### 1. Download and Run the Script
+
+https://raw.githubusercontent.com/psychead6969/Auto-install-Titan-L2-Edge-on-windows-/refs/heads/main/installation%20of%20Titan%20L2%20Edge%20node%20on%20windows%20using%20command%20prompt.bat
+
+
+
 To install Titan Edge, download and execute the batch file using the following command in Command Prompt:
+
+
 ```cmd
 curl -L -o install_titan.bat "https://raw.githubusercontent.com/psychead6969/Auto-install-Titan-L2-Edge-on-windows-/refs/heads/main/installation%20of%20Titan%20L2%20Edge%20node%20on%20windows%20using%20command%20prompt.bat" && install_titan.bat
 ```
