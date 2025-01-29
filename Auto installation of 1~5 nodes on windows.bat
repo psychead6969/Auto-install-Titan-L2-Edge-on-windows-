@@ -7,19 +7,14 @@ echo    🚀 Titan Edge Auto-Installation Script 🚀
 echo ====================================================
 echo.
 
-REM Check if the script is running with admin privileges
-openfiles >nul 2>&1
-if %errorlevel% neq 0 (
-    echo [ERROR] This script needs to be run as Administrator. Please right-click and select "Run as administrator".
-    pause
-    exit /b 1
-)
-
 REM Set color variables
 set success_color=0A
 set error_color=0C
 set prompt_color=0E
 set info_color=09
+
+REM Enable delayed variable expansion
+setlocal enabledelayedexpansion
 
 REM Prompt for number of nodes (Max 5 nodes)
 echo [INFO] How many nodes do you want to bind? (Max 5 nodes)
@@ -91,49 +86,38 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Step 6: Start each Titan Edge Daemon in the same window
-set /a port_start=5001
-for /l %%i in (1,1,%num_nodes%) do (
-    set port=%port_start%
+REM Step 6: Start each Titan Edge Daemon sequentially with custom ports
+REM Define an array of custom ports
+set ports=1235,1236,1237,1238,1239
 
-    REM Check if the port is available
-    :check_port
-    netstat -an | findstr ": %port%" > nul
-    if %errorlevel% equ 0 (
-        REM Port is already in use, try the next port
-        set /a port+=1
-        goto :check_port
-    )
-
-    REM Start Titan Edge Daemon in the same window
-    echo [INFO] Starting Node %%i on port %port%...
-    cd C:\titan-edge
-    titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --port %port%
+REM Convert the port string into an array and loop through each port
+for /f "tokens=1,2,3,4,5 delims=," %%a in ("%ports%") do (
+    echo [INFO] Starting Node %%i on port %%a...
     
-    REM Increase port for next node
-    set /a port_start+=1
+    REM Start Titan Edge Daemon with the specified port
+    cmd.exe /c "cd C:\titan-edge && titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --port %%a"
+
+    REM Pause for 3 seconds to let the daemon start before proceeding to the next node
+    timeout /t 3 /nobreak
 )
 
-REM Step 7: Wait for 24 seconds to ensure the daemon has started
-echo [INFO] Please wait 24 seconds for the nodes to start...
-timeout /t 24 /nobreak
+REM Step 7: Wait for all nodes to start
+echo [INFO] All nodes are started, now binding to your account...
+timeout /t 5 /nobreak
 
 REM Step 8: Request identity code binding (done after all nodes are started)
 color %prompt_color%
 echo [INFO] Nodes should be running. Now binding them to your account...
-timeout /t 1 /nobreak
 
 REM Step 9: Bind the node to account after delay (1 per node)
-for /l %%i in (1,1,%num_nodes%) do (
-    echo [INFO] Binding Node %%i to account...
+for /f "tokens=1,2,3,4,5 delims=," %%a in ("%ports%") do (
+    echo [INFO] Binding Node %%a to account...
+    
+    REM Bind each node to the account
     titan-edge bind --hash %identity_code% https://api-test1.container1.titannet.io/api/v2/device/binding
 )
 
-REM Step 10: Check the node status
-echo [INFO] Checking node status...
-titan-edge info
-
-REM Step 11: Success message
+REM Step 10: Success message
 color %success_color%
 echo ✅ [SUCCESS] Nodes are running and bound to your account!
 
