@@ -69,26 +69,14 @@ if %errorlevel% neq 0 (
 REM Introduce a 2-second pause to slow down
 timeout /t 2 /nobreak
 
-REM Step 5: Restart Command Prompt and continue with the installation
-color %info_color%
-echo [INFO] Restarting Command Prompt and continuing installation...
-
-REM Restarting the script
-set "restart_script=%~f0"
-start cmd /k "%restart_script% continue"
-
-REM Exit current session
-exit
-
-:continue
-REM Step 6: Start Titan Edge Daemon and Binding Node
+REM Step 5: Start Titan Edge Daemon
 color %info_color%
 echo [INFO] Starting Titan Edge Daemon...
 cd C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64
 start cmd /k "titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0"
 timeout /t 24 /nobreak  REM Timeout for 24 seconds with no user interrupt
 
-REM Step 7: Request Identity Code
+REM Step 6: Request Identity Code
 color %prompt_color%
 echo [INFO] Please enter your identity code to bind your node.
 set /p identity_code="🔹 Enter your identity code (hash): "
@@ -96,7 +84,7 @@ set /p identity_code="🔹 Enter your identity code (hash): "
 REM Introduce a 2-second pause to slow down
 timeout /t 2 /nobreak
 
-REM Step 8: Bind Node to Account
+REM Step 7: Bind Node to Account
 color %info_color%
 echo [INFO] Binding node to account...
 titan-edge bind --hash=%identity_code% https://api-test1.container1.titannet.io/api/v2/device/binding
@@ -107,7 +95,7 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Step 9: Success message
+REM Step 8: Success message
 color %success_color%
 echo ✅ [SUCCESS] Node is running and bound to your account!
 
