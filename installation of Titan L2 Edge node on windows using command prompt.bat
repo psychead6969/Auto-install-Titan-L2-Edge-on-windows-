@@ -59,25 +59,29 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Restart Command Prompt for PATH changes
-echo Restarting Command Prompt...
-start /b cmd /c C:\titan-edge\continue_installation.bat
-exit
+REM Change directory to Titan Edge folder
+cd C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64
 
-REM Create a new batch file for the remaining steps
-echo @echo off > C:\titan-edge\continue_installation.bat
-echo color %info_color% >> C:\titan-edge\continue_installation.bat
-echo echo "Continuing installation..." >> C:\titan-edge\continue_installation.bat
-echo cd C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64 >> C:\titan-edge\continue_installation.bat
+REM Prompt for identity code once
+set /p identity_code="Enter your identity code (hash): "
 
 REM Start and bind multiple nodes
 for /L %%i in (1,1,%node_count%) do (
-    echo echo Starting Titan Edge Node %%i... >> C:\titan-edge\continue_installation.bat
-    echo start /b titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --repo C:\titan-edge\node_%%i >> C:\titan-edge\continue_installation.bat
-    echo timeout /t 24 >> C:\titan-edge\continue_installation.bat
-    echo set /p identity_code%%i="Enter your identity code (hash) for Node %%i: " >> C:\titan-edge\continue_installation.bat
-    echo titan-edge bind --hash=%%identity_code%%i https://api-test1.container1.titannet.io/api/v2/device/binding >> C:\titan-edge\continue_installation.bat
+    REM Create a unique directory for each node
+    set "node_dir=C:\titan-edge\node_%%i"
+    if not exist "%node_dir%" mkdir "%node_dir%"
+    
+    echo Starting Titan Edge Node %%i...
+    start /b titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --repo "%node_dir%"
+    
+    REM Wait for 24 seconds to ensure daemon starts properly
+    timeout /t 24
+    
+    echo Binding Node %%i to the identity code...
+    titan-edge bind --hash=%identity_code% https://api-test1.container1.titannet.io/api/v2/device/binding
+    
+    echo [SUCCESS] Node %%i is running and bound to your account!
 )
 
-echo echo All nodes are running and bound to your account! >> C:\titan-edge\continue_installation.bat
-echo pause >> C:\titan-edge\continue_installation.bat
+echo All nodes are running and bound successfully!
+pause
