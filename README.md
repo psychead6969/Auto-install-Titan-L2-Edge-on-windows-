@@ -32,5 +32,4 @@ Once the installation is complete, the Titan L2 Edge node should be running. The
 
 
 ```cmd
-curl -s https://raw.githubusercontent.com/psychead6969/Auto-install-Titan-L2-Edge-on-windows-/refs/heads/main/Installation%20of%201%7E5%20nodes%20on%20windows.sh -o "%TEMP%\install_edge.sh"
-"C:\Program Files\Git\bin\bash.exe" "%TEMP%\install_edge.sh" --your_hash_value %node_count%
+powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/psychead6969/Auto-install-Titan-L2-Edge-on-windows-/refs/heads/main/Installation%20of%201%7E5%20nodes%20on%20windows.sh' -OutFile 'C:\Downloads\Installation_of_1~5_nodes_on_windows.sh'"
