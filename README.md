@@ -31,8 +31,3 @@ To install the Titan L2 Edge node, follow these steps:
 Once the installation is complete, the Titan L2 Edge node should be running. The batch file will guide you through any necessary steps.
 
 
-```cmd
-"C:\Program Files\Git\git-bash.exe"
-```
-```cmd
-curl -o "/c/Windows/Temp/Installation_of_1~5_nodes_on_windows.sh" "https://raw.githubusercontent.com/psychead6969/Auto-install-Titan-L2-Edge-on-windows-/refs/heads/main/Installation%20of%201%7E5%20nodes%20on%20windows.sh" && chmod +x "/c/Windows/Temp/Installation_of_1~5_nodes_on_windows.sh" && "/c/Windows/Temp/Installation_of_1~5_nodes_on_windows.sh"
