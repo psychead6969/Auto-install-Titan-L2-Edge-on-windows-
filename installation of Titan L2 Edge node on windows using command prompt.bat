@@ -15,7 +15,7 @@ if exist "%titan_path%" (
     echo [INFO] Titan Edge ZIP file already exists. Proceeding to extraction...
 ) else (
     echo Downloading Titan Edge ZIP file...
-    powershell -Command "& {Invoke-WebRequest -Uri '%titan_url%' -OutFile '%titan_path%'}"
+    powershell -Command "Invoke-WebRequest -Uri '%titan_url%' -OutFile '%titan_path%'"
     if %errorlevel% neq 0 (
         echo [ERROR] Failed to download Titan Edge ZIP file. Please check your internet connection.
         pause
