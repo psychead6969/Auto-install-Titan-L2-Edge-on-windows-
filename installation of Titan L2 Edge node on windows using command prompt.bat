@@ -1,4 +1,6 @@
 @echo off
+setlocal enabledelayedexpansion
+
 REM Enable color in the Command Prompt
 echo.
 echo ===========================================
@@ -62,9 +64,6 @@ if %errorlevel% neq 0 (
 REM Change directory to Titan Edge folder
 cd C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64
 
-REM Prompt for identity code once
-set /p identity_code="Enter your identity code (hash): "
-
 REM Start and bind multiple nodes
 for /L %%i in (1,1,%node_count%) do (
     REM Create a unique directory for each node
@@ -72,18 +71,13 @@ for /L %%i in (1,1,%node_count%) do (
     if not exist "!node_dir!" mkdir "!node_dir!"
     
     echo Starting Titan Edge Node %%i...
-    
-    REM Ensure proper quoting around path with delayed expansion (and remove --repo flag)
-    setlocal enabledelayedexpansion
-    start /b "" titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0
-    endlocal
+    start /b titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --repo "!node_dir!"
     
     REM Wait for 24 seconds to ensure daemon starts properly
     timeout /t 24
     
-    REM Ask for identity code after daemon starts
-    echo Binding Node %%i to the identity code...
-    titan-edge bind --hash=%identity_code% https://api-test1.container1.titannet.io/api/v2/device/binding
+    set /p identity_code="Enter your identity code (hash) for Node %%i: "
+    titan-edge bind --hash=!identity_code! https://api-test1.container1.titannet.io/api/v2/device/binding
     
     echo [SUCCESS] Node %%i is running and bound to your account!
 )
