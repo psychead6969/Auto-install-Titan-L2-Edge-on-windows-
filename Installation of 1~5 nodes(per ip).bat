@@ -9,7 +9,7 @@ echo ===================================================
 echo.
 
 REM Set up variables
-set titan_url=https://www.dropbox.com/scl/fi/82nsa6y23y6wc24yv1yve/titan-edge_v0.1.20_246b9dd_widnows_amd64.tar.zip?rlkey=6y2z6n0t8ms0o6odxgodue87p&dl=1
+set titan_url="https://www.dropbox.com/scl/fi/82nsa6y23y6wc24yv1yve/titan-edge_v0.1.20_246b9dd_widnows_amd64.tar.zip?rlkey=6y2z6n0t8ms0o6odxgodue87p&dl=1"
 set titan_path=C:\titan-edge.zip
 set titan_dir=C:\TitanNode
 set base_port=5001
@@ -19,7 +19,7 @@ if exist "%titan_path%" (
     echo [INFO] Titan Edge ZIP file already exists. Proceeding to extraction...
 ) else (
     echo Downloading Titan Edge ZIP file...
-    powershell -Command "Invoke-WebRequest -Uri '%titan_url%' -OutFile '%titan_path%'"
+    powershell -Command "Invoke-WebRequest -Uri %titan_url% -OutFile '%titan_path%'"
     if %errorlevel% neq 0 (
         echo [ERROR] Failed to download Titan Edge ZIP file.
         pause
