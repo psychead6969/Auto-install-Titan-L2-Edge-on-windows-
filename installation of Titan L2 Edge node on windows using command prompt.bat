@@ -33,11 +33,11 @@ if %errorlevel% neq 0 (
 )
 
 REM Move GoWorked DLL to Windows System32
-echo Moving GoWorked DLL to System32...
-if exist "C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64\goworked.dll" (
-    move /Y "C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64\goworked.dll" "C:\Windows\System32\goworked.dll"
+echo Moving GoWorkerd DLL to System32...
+if exist "C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64\goworkerd.dll" (
+    move /Y "C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64\goworkerd.dll" "C:\Windows\System32\goworkerd.dll"
 ) else (
-    echo [WARNING] goworked.dll not found. Titan Edge may not work correctly.
+    echo [WARNING] goworkerd.dll not found. Titan Edge may not work correctly.
 )
 
 REM Add Titan Edge to system PATH
