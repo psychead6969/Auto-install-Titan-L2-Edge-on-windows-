@@ -22,6 +22,7 @@ set /p identity_code="Enter your Titan Identity Code (hash): "
 REM Set Titan Edge download link
 set titan_url=https://www.dropbox.com/scl/fi/82nsa6y23y6wc24yv1yve/titan-edge_v0.1.20_246b9dd_widnows_amd64.tar.zip?rlkey=6y2z6n0t8ms0o6odxgodue87p&dl=1
 set titan_path=C:\titan-edge.zip
+set titan_dir=C:\TitanNodes
 
 REM Check if Titan Edge is already downloaded
 if exist "%titan_path%" (
@@ -38,12 +39,12 @@ if exist "%titan_path%" (
 
 REM Extract Titan Edge
 echo Extracting Titan Edge ZIP file...
-powershell -Command "Expand-Archive -Path 'C:\titan-edge.zip' -DestinationPath 'C:\titan-edge' -Force"
+powershell -Command "Expand-Archive -Path 'C:\titan-edge.zip' -DestinationPath '%titan_dir%' -Force"
 
 REM Install Titan Edge daemon for each node
 for /L %%i in (1,1,%node_count%) do (
-    set node_dir=C:\TitanNode%%i
-    if not exist "!node_dir!" mkdir "!node_dir!"
+    set node_folder=%titan_dir%\Node%%i
+    if not exist "!node_folder!" mkdir "!node_folder!"
 
     echo.
     echo ===========================================
@@ -51,8 +52,8 @@ for /L %%i in (1,1,%node_count%) do (
     echo ===========================================
     echo.
 
-    cd /d C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64
-    start "Titan Node %%i" cmd /k "titan-edge daemon start --init --data=!node_dir! --url https://cassini-locator.titannet.io:5000/rpc/v0"
+    cd /d %titan_dir%\titan-edge_v0.1.20_246b9dd_widnows_amd64
+    start "Titan Node %%i" cmd /k "titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0"
 
     REM Wait 20 seconds for the daemon to initialize
     timeout /t 20 /nobreak >nul
@@ -71,3 +72,4 @@ echo.
 
 pause
 exit
+
