@@ -64,12 +64,18 @@ if %errorlevel% neq 0 (
     goto ask_nodes
 )
 
-REM Step 6: Download the Titan Edge installation script
-curl -s -o C:\temp\install_nodes.sh https://raw.githubusercontent.com/psychead6969/Auto-install-Titan-L2-Edge-on-windows-/refs/heads/main/Installation%20of%201~5%20nodes%20on%20windows.sh
+REM Step 6: Download the Titan Edge installation script to a common directory
+echo [INFO] Downloading the Titan Edge installation script...
+curl -s -o "%TEMP%\install_nodes.sh" https://raw.githubusercontent.com/psychead6969/Auto-install-Titan-L2-Edge-on-windows-/refs/heads/main/Installation%20of%201~5%20nodes%20on%20windows.sh
+if %errorlevel% neq 0 (
+    echo [ERROR] Failed to download the script. Please check the URL and your internet connection.
+    pause
+    exit /b 1
+)
 
 REM Step 7: Execute script using Git Bash
 echo Running the script with Identity Code and Node Count...
-"C:\Program Files\Git\bin\bash.exe" C:\temp\install_nodes.sh %identity_code% %node_count%
+"C:\Program Files\Git\bin\bash.exe" "%TEMP%\install_nodes.sh" %identity_code% %node_count%
 
 echo.
 echo ===================================================
