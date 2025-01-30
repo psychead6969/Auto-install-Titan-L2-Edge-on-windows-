@@ -33,11 +33,11 @@ if %errorlevel% neq 0 (
 )
 
 REM Move GoWorked DLL to Windows System32
-echo Moving GoWorkerd DLL to System32...
-if exist "C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64\goworkerd.dll" (
-    move /Y "C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64\goworkerd.dll" "C:\Windows\System32\goworkerd.dll"
+echo Moving GoWorked DLL to System32...
+if exist "C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64\goworked.dll" (
+    move /Y "C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64\goworked.dll" "C:\Windows\System32\goworked.dll"
 ) else (
-    echo [WARNING] goworkerd.dll not found. Titan Edge may not work correctly.
+    echo [WARNING] goworked.dll not found. Titan Edge may not work correctly.
 )
 
 REM Add Titan Edge to system PATH
@@ -57,6 +57,7 @@ echo Starting Titan Edge node in the background...
 start /b titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 > nul 2>&1
 
 REM Wait for the daemon to initialize
+echo Waiting for 24 seconds to ensure the daemon starts properly...
 timeout /t 24 > nul
 
 REM Prompt for identity code after daemon starts
