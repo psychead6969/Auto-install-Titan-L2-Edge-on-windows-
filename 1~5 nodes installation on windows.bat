@@ -14,12 +14,28 @@ set error_color=0C
 set prompt_color=0E
 set info_color=07
 
-REM Step 1: Check if Curl is installed
+REM Step 1: Check if Git Bash is installed
+echo Checking for Git Bash...
+if exist "C:\Program Files\Git\bin\bash.exe" (
+    echo [INFO] Git Bash is already installed.
+) else (
+    echo [INFO] Git Bash is not installed. Installing Git Bash...
+    REM Step 2: Install Git Bash using winget
+    winget install --id=Git.Git --source=winget
+    if %errorlevel% neq 0 (
+        echo [ERROR] Failed to install Git Bash. Please install Git for Windows manually and re-run this script.
+        pause
+        exit /b 1
+    )
+    echo [INFO] Git Bash installation completed.
+)
+
+REM Step 3: Check if Curl is installed
 echo Checking for Curl...
 curl --version >nul 2>&1
 if %errorlevel% neq 0 (
     echo [INFO] Curl is not installed. Installing Curl using winget...
-    REM Step 2: Install curl using winget
+    REM Install curl using winget
     winget install --id=Curl.Curl --source=winget
     if %errorlevel% neq 0 (
         echo [ERROR] Failed to install curl. Please install curl manually and re-run this script.
@@ -29,30 +45,20 @@ if %errorlevel% neq 0 (
     echo [INFO] Curl installation completed.
 )
 
-REM Step 3: Check if WSL is installed
-echo Checking for WSL installation...
-wsl --list >nul 2>&1
-if %errorlevel% neq 0 (
-    echo [INFO] WSL is not installed. Installing WSL...
-    REM Step 4: Install WSL
-    powershell -Command "wsl --install"
-    if %errorlevel% neq 0 (
-        echo [ERROR] Failed to install WSL. Please install WSL manually and re-run this script.
-        pause
-        exit /b 1
-    )
-    echo [INFO] WSL installation completed. Please restart your machine if prompted.
-    pause
-    exit /b 1
-)
+REM Step 4: Ask for Identity Code
+echo.
+echo ===================================================
+echo   PLEASE ENTER YOUR TITAN IDENTITY CODE
+echo ===================================================
+set /p identity_code="Enter your Titan Identity Code (hash): "
 
 REM Step 5: Download edge.sh script
 echo Downloading edge.sh script...
 curl -s https://raw.githubusercontent.com/laodauhgc/bash-scripts/refs/heads/main/titan-network/edge.sh -o C:\temp\edge.sh
 
-REM Step 6: Run edge.sh script using WSL
-echo Running the edge.sh script using WSL...
-wsl bash /mnt/c/temp/edge.sh 355EE3C6-B533-4712-9C70-F251EF8CA5CB
+REM Step 6: Run edge.sh script using Git Bash
+echo Running the edge.sh script using Git Bash with Identity Code: %identity_code%...
+"C:\Program Files\Git\bin\bash.exe" C:\temp\edge.sh %identity_code%
 
 echo.
 echo ===================================================
