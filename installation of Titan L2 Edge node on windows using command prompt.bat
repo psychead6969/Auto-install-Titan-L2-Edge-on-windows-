@@ -4,7 +4,7 @@ setlocal enabledelayedexpansion
 REM Enable color in the Command Prompt
 echo.
 echo ===================================================
-echo   Titan Edge Multi-Node Auto Installation Script
+echo   Titan Edge Multi-Node Installation (Port-Based)
 echo ===================================================
 echo.
 
@@ -16,7 +16,7 @@ if %node_count% GTR 5 (
     exit /b 1
 )
 
-REM Ask for identity code once (all nodes will use the same)
+REM Ask for identity code (all nodes use the same)
 set /p identity_code="Enter your Titan Identity Code (hash): "
 
 REM Set Titan Edge download link
@@ -40,26 +40,31 @@ REM Extract Titan Edge
 echo Extracting Titan Edge ZIP file...
 powershell -Command "Expand-Archive -Path 'C:\titan-edge.zip' -DestinationPath 'C:\titan-edge' -Force"
 
+REM Define base port (each node will use a different one)
+set base_port=5100
+
 REM Install Titan Edge daemon for each node
 for /L %%i in (1,1,%node_count%) do (
+    set /a node_port=%base_port%+%%i
     set node_dir=C:\TitanNode%%i
     if not exist "!node_dir!" mkdir "!node_dir!"
 
     echo.
     echo ===========================================
-    echo   Starting Titan Edge Node %%i
+    echo   Starting Titan Edge Node %%i on Port !node_port!
     echo ===========================================
     echo.
 
-    start cmd /k "cd /d C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64 && titan-edge daemon --repo=!node_dir! start --init --url https://cassini-locator.titannet.io:5000/rpc/v0"
-    
-    REM Wait 20 seconds to ensure daemon starts properly
+    cd /d C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64
+    titan-edge daemon --repo=!node_dir! start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --listen=:!node_port! 
+
+    REM Wait 20 seconds for the daemon to initialize
     timeout /t 20 /nobreak >nul
 
     REM Bind the node to the identity
-    start cmd /k "cd /d C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64 && titan-edge --repo=!node_dir! bind --hash=%identity_code% https://api-test1.container1.titannet.io/api/v2/device/binding"
+    titan-edge --repo=!node_dir! bind --hash=%identity_code% https://api-test1.container1.titannet.io/api/v2/device/binding
 
-    echo [SUCCESS] Node %%i is running and bound to your account!
+    echo [SUCCESS] Node %%i is running on port !node_port! and bound to your account!
 )
 
 echo.
