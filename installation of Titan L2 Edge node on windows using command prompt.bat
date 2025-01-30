@@ -56,13 +56,13 @@ for /L %%i in (1,1,%node_count%) do (
     echo.
 
     cd /d C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64
-    titan-edge daemon --repo=!node_dir! start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --listen=:!node_port! 
+    start "Titan Node %%i" cmd /k "titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --listen=:!node_port! --data=!node_dir!"
 
     REM Wait 20 seconds for the daemon to initialize
     timeout /t 20 /nobreak >nul
 
     REM Bind the node to the identity
-    titan-edge --repo=!node_dir! bind --hash=%identity_code% https://api-test1.container1.titannet.io/api/v2/device/binding
+    start "Binding Node %%i" cmd /k "titan-edge bind --hash=%identity_code% https://api-test1.container1.titannet.io/api/v2/device/binding"
 
     echo [SUCCESS] Node %%i is running on port !node_port! and bound to your account!
 )
