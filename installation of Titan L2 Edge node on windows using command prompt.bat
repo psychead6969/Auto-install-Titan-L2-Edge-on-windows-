@@ -14,15 +14,6 @@ set error_color=0C
 set prompt_color=0E
 set info_color=07
 
-REM Step 1: Check if Curl is installed
-echo Checking for Curl...
-curl --version >nul 2>&1
-if %errorlevel% neq 0 (
-    echo [ERROR] Curl is not installed. Please install Curl manually and re-run this script.
-    pause
-    exit /b 1
-)
-
 REM Step 2: Set up variables
 set titan_url=https://www.dropbox.com/scl/fi/82nsa6y23y6wc24yv1yve/titan-edge_v0.1.20_246b9dd_widnows_amd64.tar.zip?rlkey=6y2z6n0t8ms0o6odxgodue87p&dl=1
 set titan_path=C:\titan-edge.zip
@@ -33,7 +24,7 @@ if exist "%titan_path%" (
     echo [INFO] Titan Edge ZIP file already exists. Proceeding to extraction...
 ) else (
     echo Downloading Titan Edge ZIP file...
-    curl -L -o "%titan_path%" "%titan_url%"
+    powershell -Command "Invoke-WebRequest -Uri '%titan_url%' -OutFile '%titan_path%'"
     if %errorlevel% neq 0 (
         echo [ERROR] Failed to download Titan Edge ZIP file.
         pause
@@ -53,10 +44,20 @@ if %errorlevel% neq 0 (
 REM Step 5: Move goworkerd.dll to System32
 echo Moving necessary files...
 move /y "%titan_dir%\titan-edge_v0.1.20_246b9dd_widnows_amd64\goworkerd.dll" "C:\Windows\System32"
+if %errorlevel% neq 0 (
+    echo [ERROR] Failed to move goworkerd.dll to System32.
+    pause
+    exit /b 1
+)
 
 REM Step 6: Add Titan Edge to PATH
 echo Adding Titan Edge to system PATH...
 setx PATH "%PATH%;%titan_dir%\titan-edge_v0.1.20_246b9dd_widnows_amd64"
+if %errorlevel% neq 0 (
+    echo [ERROR] Failed to add Titan Edge to system PATH.
+    pause
+    exit /b 1
+)
 
 REM Step 7: Start the Titan Edge daemon in the same Command Prompt window
 echo.
