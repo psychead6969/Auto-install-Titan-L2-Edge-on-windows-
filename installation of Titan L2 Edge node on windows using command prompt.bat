@@ -4,7 +4,7 @@ setlocal enabledelayedexpansion
 REM Enable color in the Command Prompt
 echo.
 echo ===================================================
-echo   Titan Edge Multi-Node Installation (Port-Based)
+echo   Titan Edge Multi-Node Installation
 echo ===================================================
 echo.
 
@@ -40,23 +40,19 @@ REM Extract Titan Edge
 echo Extracting Titan Edge ZIP file...
 powershell -Command "Expand-Archive -Path 'C:\titan-edge.zip' -DestinationPath 'C:\titan-edge' -Force"
 
-REM Define base port (each node will use a different one)
-set base_port=5100
-
 REM Install Titan Edge daemon for each node
 for /L %%i in (1,1,%node_count%) do (
-    set /a node_port=%base_port%+%%i
     set node_dir=C:\TitanNode%%i
     if not exist "!node_dir!" mkdir "!node_dir!"
 
     echo.
     echo ===========================================
-    echo   Starting Titan Edge Node %%i on Port !node_port!
+    echo   Starting Titan Edge Node %%i
     echo ===========================================
     echo.
 
     cd /d C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64
-    start "Titan Node %%i" cmd /k "titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 --listen=:!node_port! --data=!node_dir!"
+    start "Titan Node %%i" cmd /k "titan-edge daemon start --init --data=!node_dir! --url https://cassini-locator.titannet.io:5000/rpc/v0"
 
     REM Wait 20 seconds for the daemon to initialize
     timeout /t 20 /nobreak >nul
@@ -64,7 +60,7 @@ for /L %%i in (1,1,%node_count%) do (
     REM Bind the node to the identity
     start "Binding Node %%i" cmd /k "titan-edge bind --hash=%identity_code% https://api-test1.container1.titannet.io/api/v2/device/binding"
 
-    echo [SUCCESS] Node %%i is running on port !node_port! and bound to your account!
+    echo [SUCCESS] Node %%i is running and bound to your account!
 )
 
 echo.
