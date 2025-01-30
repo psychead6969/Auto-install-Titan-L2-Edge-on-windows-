@@ -6,21 +6,13 @@ echo   Titan Edge Single-Node Installation
 echo ===========================================
 echo.
 
-REM Set Titan Edge download link
-set titan_url=https://www.dropbox.com/scl/fi/82nsa6y23y6wc24yv1yve/titan-edge_v0.1.20_246b9dd_widnows_amd64.tar.zip?dl=1
-set titan_path=C:\titan-edge.zip
-
-REM Check if Titan Edge is already downloaded
-if exist "%titan_path%" (
-    echo [INFO] Titan Edge ZIP file already exists. Proceeding to extraction...
-) else (
-    echo Downloading Titan Edge ZIP file...
-    powershell -Command "Invoke-WebRequest -Uri '%titan_url%' -OutFile '%titan_path%'"
-    if %errorlevel% neq 0 (
-        echo [ERROR] Failed to download Titan Edge ZIP file. Please check your internet connection.
-        pause
-        exit /b 1
-    )
+REM Direct URL and file path for Titan Edge download
+echo Downloading Titan Edge ZIP file...
+powershell -Command "Invoke-WebRequest -Uri 'https://www.dropbox.com/scl/fi/82nsa6y23y6wc24yv1yve/titan-edge_v0.1.20_246b9dd_widnows_amd64.tar.zip?dl=1' -OutFile 'C:\titan-edge.zip'"
+if %errorlevel% neq 0 (
+    echo [ERROR] Failed to download Titan Edge ZIP file. Please check your internet connection.
+    pause
+    exit /b 1
 )
 
 REM Extract Titan Edge
