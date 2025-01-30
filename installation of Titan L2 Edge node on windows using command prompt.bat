@@ -58,48 +58,28 @@ REM Step 6: Add Titan Edge to PATH
 echo Adding Titan Edge to system PATH...
 setx PATH "%PATH%;%titan_dir%\titan-edge_v0.1.20_246b9dd_widnows_amd64"
 
-REM Step 7: Start the Titan Edge daemon
+REM Step 7: Start the Titan Edge daemon in the same Command Prompt window
 echo.
 echo ===========================================
 echo   STARTING TITAN EDGE NODE...
 echo ===========================================
 echo.
 cd /d %titan_dir%\titan-edge_v0.1.20_246b9dd_widnows_amd64
-start "Titan Edge Daemon" cmd /k "titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0"
+start "" cmd /k "titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0"
 
 REM Step 8: Wait 24 seconds for daemon to initialize
 timeout /t 24 /nobreak >nul
 
-REM Step 9: Ask for the number of nodes to install (maximum of 5)
-set /p node_count="Enter the number of nodes to install (max 5): "
-if "%node_count%" lss "1" (
-    echo [ERROR] Invalid number of nodes. Please enter a value between 1 and 5.
-    pause
-    exit /b 1
-)
-if "%node_count%" gtr "5" (
-    echo [ERROR] Too many nodes. Please enter a value between 1 and 5.
-    pause
-    exit /b 1
-)
-
-REM Step 10: Ask for the Titan Identity Code
+REM Step 9: Ask for the Titan Identity Code
 set /p identity_code="Enter your Titan Identity Code (hash): "
 
-REM Step 11: Invoke PowerShell to start the binding for each node
-echo Invoking PowerShell to start Titan Edge node bindings...
-
-powershell -Command "
-for ($i = 1; $i -le %node_count%; $i++) {
-    Write-Host 'Binding node' $i;
-    Start-Process 'titan-edge' -ArgumentList 'bind --hash=%identity_code% https://api-test1.container1.titannet.io/api/v2/device/binding' -NoNewWindow
-    Start-Sleep -Seconds 2
-}
-"
+REM Step 10: Bind the node (No PowerShell, just run the binding directly)
+echo Binding the Titan Edge node...
+titan-edge bind --hash=%identity_code% https://api-test1.container1.titannet.io/api/v2/device/binding
 
 echo.
 echo ===================================================
-echo   NODES SUCCESSFULLY INSTALLED & BOUND!
+echo   NODE SUCCESSFULLY INSTALLED & BOUND!
 echo ===================================================
 echo.
 
