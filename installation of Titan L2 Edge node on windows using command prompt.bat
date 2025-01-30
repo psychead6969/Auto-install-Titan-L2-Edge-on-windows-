@@ -52,16 +52,16 @@ if %errorlevel% neq 0 (
 REM Change directory to Titan Edge folder
 cd C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64
 
-REM Start the Titan Edge node with port 5000
-echo Starting Titan Edge node on port 5000...
-start /b "" titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0
+REM Start the Titan Edge node in the background
+echo Starting Titan Edge node in the background...
+start /b titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 > nul 2>&1
 
-REM Wait for the daemon to start
-timeout /t 24
+REM Wait for the daemon to initialize
+timeout /t 24 > nul
 
 REM Prompt for identity code after daemon starts
 set /p identity_code="Enter your identity code (hash) for binding: "
 titan-edge bind --hash=%identity_code% https://api-test1.container1.titannet.io/api/v2/device/binding
 
-echo [SUCCESS] Node is running on port 5000 and bound to your account!
+echo [SUCCESS] Node is running in the background and bound to your account!
 pause
