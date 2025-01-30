@@ -1,60 +1,105 @@
 @echo off
-REM Enable color in the Command Prompt
+title Titan Edge Auto Installer
+color 0E
 echo.
-echo ===========================================
-echo   Titan Edge Single-Node Installation
-echo ===========================================
+echo ====================================================
+echo    🚀 Titan Edge Auto-Installation Script 🚀
+echo ====================================================
 echo.
 
-REM Direct URL and file path for Titan Edge download
-echo Downloading Titan Edge ZIP file...
-powershell -Command "Invoke-WebRequest -Uri 'https://www.dropbox.com/scl/fi/82nsa6y23y6wc24yv1yve/titan-edge_v0.1.20_246b9dd_widnows_amd64.tar.zip?dl=1' -OutFile 'C:\titan-edge.zip'"
+REM Set color variables
+set success_color=0A
+set error_color=0C
+set prompt_color=0E
+set info_color=09
+
+REM Step 1: Download the Titan Edge ZIP file directly using Invoke-WebRequest
+color %info_color%
+echo [INFO] Downloading Titan Edge ZIP file...
+powershell -Command "Invoke-WebRequest -Uri 'https://www.dropbox.com/scl/fi/82nsa6y23y6wc24yv1yve/titan-edge_v0.1.20_246b9dd_widnows_amd64.tar.zip?rlkey=6y2z6n0t8ms0o6odxgodue87p&dl=1' -OutFile 'C:\titan-edge.zip'"
 if %errorlevel% neq 0 (
-    echo [ERROR] Failed to download Titan Edge ZIP file. Please check your internet connection.
+    color %error_color%
+    echo [ERROR] Failed to download Titan Edge ZIP file. Check your internet connection.
     pause
     exit /b 1
 )
 
-REM Extract Titan Edge
-echo Extracting Titan Edge ZIP file...
+REM Introduce a 2-second pause to slow down
+timeout /t 2 /nobreak
+
+REM Step 2: Extract the ZIP file
+color %info_color%
+echo [INFO] Extracting Titan Edge ZIP file...
 powershell -Command "Expand-Archive -Path 'C:\titan-edge.zip' -DestinationPath 'C:\titan-edge' -Force"
 if %errorlevel% neq 0 (
-    echo [ERROR] Failed to extract ZIP file. Exiting...
+    color %error_color%
+    echo [ERROR] Failed to extract ZIP file.
     pause
     exit /b 1
 )
 
-REM Move GoWorked DLL to Windows System32
-echo Moving GoWorked DLL to System32...
-if exist "C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64\goworked.dll" (
-    move /Y "C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64\goworked.dll" "C:\Windows\System32\goworked.dll"
-) else (
-    echo [WARNING] goworked.dll not found. Titan Edge may not work correctly.
+REM Introduce a 2-second pause to slow down
+timeout /t 2 /nobreak
+
+REM Step 3: Move goworkerd.dll to System32
+color %info_color%
+echo [INFO] Moving goworkerd.dll to C:\Windows\System32...
+move /y "C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64\goworkerd.dll" "C:\Windows\System32"
+if %errorlevel% neq 0 (
+    color %error_color%
+    echo [ERROR] Failed to move goworkerd.dll.
+    pause
+    exit /b 1
 )
 
-REM Add Titan Edge to system PATH
-echo Adding Titan Edge directory to PATH...
+REM Introduce a 2-second pause to slow down
+timeout /t 2 /nobreak
+
+REM Step 4: Set Titan Edge in the system PATH
+color %info_color%
+echo [INFO] Adding Titan Edge directory to PATH...
 setx PATH "%PATH%;C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64"
 if %errorlevel% neq 0 (
-    echo [ERROR] Failed to add Titan Edge to PATH. Exiting...
+    color %error_color%
+    echo [ERROR] Failed to add Titan Edge to PATH.
     pause
     exit /b 1
 )
 
-REM Change directory to Titan Edge folder
+REM Introduce a 2-second pause to slow down
+timeout /t 2 /nobreak
+
+REM Step 5: Start Titan Edge Daemon
+color %info_color%
+echo [INFO] Starting Titan Edge Daemon...
 cd C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64
+start cmd /k "titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0"
+timeout /t 24 /nobreak  REM Timeout for 24 seconds with no user interrupt
 
-REM Start the Titan Edge node in the background
-echo Starting Titan Edge node in the background...
-start /b titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0 > nul 2>&1
+REM Step 6: Request Identity Code
+color %prompt_color%
+echo [INFO] Please enter your identity code to bind your node.
+set /p identity_code="🔹 Enter your identity code (hash): "
 
-REM Wait for the daemon to initialize
-echo Waiting for 24 seconds to ensure the daemon starts properly...
-timeout /t 24 > nul
+REM Introduce a 2-second pause to slow down
+timeout /t 2 /nobreak
 
-REM Prompt for identity code after daemon starts
-set /p identity_code="Enter your identity code (hash) for binding: "
+REM Step 7: Bind Node to Account
+color %info_color%
+echo [INFO] Binding node to account...
 titan-edge bind --hash=%identity_code% https://api-test1.container1.titannet.io/api/v2/device/binding
+if %errorlevel% neq 0 (
+    color %error_color%
+    echo [ERROR] Failed to bind node to your account.
+    pause
+    exit /b 1
+)
 
-echo [SUCCESS] Node is running in the background and bound to your account!
-pause
+REM Step 8: Success message
+color %success_color%
+echo ✅ [SUCCESS] Node is running and bound to your account!
+
+REM Final pause to allow user to see success message
+timeout /t 2 /nobreak
+
+exit
