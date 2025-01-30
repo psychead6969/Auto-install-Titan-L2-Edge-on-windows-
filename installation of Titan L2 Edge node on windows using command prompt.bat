@@ -7,7 +7,7 @@ echo ===========================================
 echo.
 
 REM Set Titan Edge download link
-set titan_url=https://www.dropbox.com/scl/fi/82nsa6y23y6wc24yv1yve/titan-edge_v0.1.20_246b9dd_widnows_amd64.tar.zip?rlkey=6y2z6n0t8ms0o6odxgodue87p&dl=1
+set titan_url=https://www.dropbox.com/scl/fi/82nsa6y23y6wc24yv1yve/titan-edge_v0.1.20_246b9dd_widnows_amd64.tar.zip?dl=1
 set titan_path=C:\titan-edge.zip
 
 REM Check if Titan Edge is already downloaded
