@@ -32,6 +32,14 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
+REM Move GoWork DLL to Windows System32
+echo Moving GoWork DLL to System32...
+if exist "C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64\gowork.dll" (
+    move /Y "C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64\gowork.dll" "C:\Windows\System32\gowork.dll"
+) else (
+    echo [WARNING] gowork.dll not found. Titan Edge may not work correctly.
+)
+
 REM Add Titan Edge to system PATH
 echo Adding Titan Edge directory to PATH...
 setx PATH "%PATH%;C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64"
@@ -44,16 +52,16 @@ if %errorlevel% neq 0 (
 REM Change directory to Titan Edge folder
 cd C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64
 
-REM Start the Titan Edge node using the default URL
-echo Starting Titan Edge node...
-start /b "" titan-edge daemon start --init --url https://cassini-locator.titannet.io/rpc/v0
+REM Start the Titan Edge node with port 5000
+echo Starting Titan Edge node on port 5000...
+start /b "" titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0
 
 REM Wait for the daemon to start
 timeout /t 24
 
-REM Prompt for identity code after the daemon starts
+REM Prompt for identity code after daemon starts
 set /p identity_code="Enter your identity code (hash) for binding: "
 titan-edge bind --hash=%identity_code% https://api-test1.container1.titannet.io/api/v2/device/binding
 
-echo [SUCCESS] Node is running and bound to your account!
+echo [SUCCESS] Node is running on port 5000 and bound to your account!
 pause
