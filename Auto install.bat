@@ -41,79 +41,67 @@ if exist "C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64" (
 ) else (
     color 09
     echo [INFO] Titan Edge not installed. Proceeding with installation...
-    REM Step 3: Download Titan Edge
-    echo.
-    echo [INFO] Downloading Titan Edge ZIP file...
-    powershell -Command "Invoke-WebRequest -Uri 'https://www.dropbox.com/scl/fi/82nsa6y23y6wc24yv1yve/titan-edge_v0.1.20_246b9dd_widnows_amd64.tar.zip?rlkey=6y2z6n0t8ms0o6odxgodue87p&dl=1' -OutFile 'C:\titan-edge.zip'"
-    if %errorlevel% neq 0 (
-        color 0C
-        echo [ERROR] Failed to download Titan Edge ZIP file. Check your internet connection.
-        pause
-        exit /b 1
-    )
-    timeout /t 2 /nobreak
-
-    REM Step 4: Extract ZIP File
-    color 09
-    echo.
-    echo [INFO] Extracting Titan Edge ZIP file...
-    powershell -Command "Expand-Archive -Path 'C:\titan-edge.zip' -DestinationPath 'C:\titan-edge' -Force"
-    if %errorlevel% neq 0 (
-        color 0C
-        echo [ERROR] Failed to extract ZIP file.
-        pause
-        exit /b 1
-    )
-    timeout /t 2 /nobreak
-
-    REM Step 5: Move goworkerd.dll to System32
-    color 09
-    echo.
-    echo [INFO] Moving goworkerd.dll to C:\Windows\System32...
-    move /y "C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64\goworkerd.dll" "C:\Windows\System32"
-    if %errorlevel% neq 0 (
-        color 0C
-        echo [ERROR] Failed to move goworkerd.dll.
-        pause
-        exit /b 1
-    )
-    timeout /t 2 /nobreak
-
-    REM Step 6: Set Titan Edge in the system PATH
-    color 09
-    echo.
-    echo [INFO] Adding Titan Edge directory to system PATH...
-    setx PATH "%PATH%;C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64"
-    if %errorlevel% neq 0 (
-        color 0C
-        echo [ERROR] Failed to add Titan Edge to PATH.
-        pause
-        exit /b 1
+    
+    REM Step 3: Check if the ZIP file is already downloaded
+    if exist "C:\titan-edge.zip" (
+        color 09
+        echo [INFO] Titan Edge ZIP file already downloaded. Skipping download...
+    ) else (
+        REM Step 4: Download Titan Edge
+        echo [INFO] Downloading Titan Edge ZIP file...
+        powershell -Command "Invoke-WebRequest -Uri 'https://www.dropbox.com/scl/fi/82nsa6y23y6wc24yv1yve/titan-edge_v0.1.20_246b9dd_widnows_amd64.tar.zip?rlkey=6y2z6n0t8ms0o6odxgodue87p&dl=1' -OutFile 'C:\titan-edge.zip'"
+        if %errorlevel% neq 0 (
+            color 0C
+            echo [ERROR] Failed to download Titan Edge ZIP file. Check your internet connection.
+            pause
+            exit /b 1
+        )
     )
     timeout /t 2 /nobreak
 )
 
-:proceed_with_setup
-
-REM Step 7: Set up auto-start for the daemon using Task Scheduler
+REM Step 5: Extract ZIP File
 color 09
 echo.
-echo ================================================================
-echo              CONFIGURING AUTO-START FOR DAEMON...
-echo ================================================================
-echo [INFO] Adding Titan Edge Daemon to Windows startup...
-
-schtasks /create /tn "TitanEdgeDaemon" /tr "\"C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64\titan-edge.exe\" daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0" /sc onstart /ru SYSTEM /f
+echo [INFO] Extracting Titan Edge ZIP file...
+powershell -Command "Expand-Archive -Path 'C:\titan-edge.zip' -DestinationPath 'C:\titan-edge' -Force"
 if %errorlevel% neq 0 (
     color 0C
-    echo [ERROR] Failed to configure auto-start for Titan Edge Daemon.
+    echo [ERROR] Failed to extract ZIP file.
     pause
     exit /b 1
 )
-
 timeout /t 2 /nobreak
 
-REM Step 8: Start Titan Edge Daemon in the Background
+REM Step 6: Move goworkerd.dll to System32
+color 09
+echo.
+echo [INFO] Moving goworkerd.dll to C:\Windows\System32...
+move /y "C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64\goworkerd.dll" "C:\Windows\System32"
+if %errorlevel% neq 0 (
+    color 0C
+    echo [ERROR] Failed to move goworkerd.dll.
+    pause
+    exit /b 1
+)
+timeout /t 2 /nobreak
+
+REM Step 7: Set Titan Edge in the system PATH
+color 09
+echo.
+echo [INFO] Adding Titan Edge directory to system PATH...
+setx PATH "%PATH%;C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64"
+if %errorlevel% neq 0 (
+    color 0C
+    echo [ERROR] Failed to add Titan Edge to PATH.
+    pause
+    exit /b 1
+)
+timeout /t 2 /nobreak
+
+:proceed_with_setup
+
+REM Step 8: Start Titan Edge Daemon
 color 09
 echo.
 echo ================================================================
@@ -171,6 +159,22 @@ echo ================================================================
 echo                  ✅ NODE SUCCESSFULLY BOUND! ✅
 echo ================================================================
 echo Your Titan Edge node is now running and connected to the network!
-timeout /t 2 /nobreak
 
+REM Step 12: Set up auto-start for the daemon using Task Scheduler
+color 09
+echo.
+echo ================================================================
+echo              CONFIGURING AUTO-START FOR DAEMON...
+echo ================================================================
+echo [INFO] Adding Titan Edge Daemon to Windows startup...
+
+schtasks /create /tn "TitanEdgeDaemon" /tr "\"C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64\titan-edge.exe\" daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0" /sc onstart /ru SYSTEM /f
+if %errorlevel% neq 0 (
+    color 0C
+    echo [ERROR] Failed to configure auto-start for Titan Edge Daemon.
+    pause
+    exit /b 1
+)
+
+timeout /t 2 /nobreak
 exit
