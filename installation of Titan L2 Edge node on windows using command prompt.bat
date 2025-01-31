@@ -7,6 +7,20 @@ echo            Titan Edge Auto-Installation Script
 echo ================================================================
 echo.
 
+REM Step 0: Check for Administrator Privileges
+net session >nul 2>&1
+if %errorlevel% neq 0 (
+    color 0C
+    echo [ERROR] This script must be run as an Administrator!
+    echo.
+    echo [INFO] Please restart the Command Prompt as Administrator and try again.
+    echo.
+    echo [TIP] To run as Administrator, right-click on "Command Prompt" and select "Run as administrator."
+    echo.
+    pause
+    exit /b 1
+)
+
 REM Set color variables
 set success_color=0A
 set error_color=0C
@@ -103,11 +117,15 @@ goto :continue
 
 :timer
 cls
-echo [INFO] Daemon is initializing... %remaining% seconds remaining.
+echo ================================================================
+echo                    Titan Edge Setup
+echo ================================================================
 echo.
 echo   ███████████████████████████████████████████
 echo   ████  Please wait, setting up Titan Edge...  ████
 echo   ███████████████████████████████████████████
+echo.
+echo     🕒 Daemon is initializing... %remaining% seconds remaining.
 echo.
 
 :continue
