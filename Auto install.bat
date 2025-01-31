@@ -101,16 +101,35 @@ timeout /t 2 /nobreak
 
 :proceed_with_setup
 
-REM Step 7: Start Titan Edge Daemon in the Background
+REM Step 7: Set up auto-start for the daemon using Task Scheduler
+color 09
+echo.
+echo ================================================================
+echo              CONFIGURING AUTO-START FOR DAEMON...
+echo ================================================================
+echo [INFO] Adding Titan Edge Daemon to Windows startup...
+
+schtasks /create /tn "TitanEdgeDaemon" /tr "\"C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64\titan-edge.exe\" daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0" /sc onstart /ru SYSTEM /f
+if %errorlevel% neq 0 (
+    color 0C
+    echo [ERROR] Failed to configure auto-start for Titan Edge Daemon.
+    pause
+    exit /b 1
+)
+
+timeout /t 2 /nobreak
+
+REM Step 8: Start Titan Edge Daemon in the Background
 color 09
 echo.
 echo ================================================================
 echo              STARTING TITAN EDGE DAEMON...
 echo ================================================================
+echo [INFO] Titan Edge Daemon is starting in the background...
 cd C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64
 start "" /B titan-edge daemon start --init --url https://cassini-locator.titannet.io:5000/rpc/v0
 
-REM Step 8: Display Countdown Timer (24 Seconds)
+REM Step 9: Display Countdown Timer (24 Seconds)
 color 0B
 echo.
 echo ================================================================
@@ -136,7 +155,7 @@ echo.
 
 :continue
 
-REM Step 9: Bind Node to Account
+REM Step 10: Bind Node to Account
 color 09
 echo.
 echo ================================================================
@@ -151,7 +170,7 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Step 10: Success Message
+REM Step 11: Success Message
 color 0A
 echo.
 echo ================================================================
