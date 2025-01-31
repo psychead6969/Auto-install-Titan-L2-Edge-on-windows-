@@ -37,8 +37,8 @@ echo [INFO] Checking if Titan Edge is already installed...
 
 if exist "C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64" (
     color 0A
-    echo [SUCCESS] Titan Edge is already installed! Skipping installation...
-    goto skip_installation
+    echo [SUCCESS] Titan Edge is already installed! Proceeding with setup...
+    goto proceed_with_setup
 )
 
 timeout /t 2 /nobreak
@@ -99,7 +99,7 @@ if %errorlevel% neq 0 (
 
 timeout /t 2 /nobreak
 
-:skip_installation
+:proceed_with_setup
 
 REM Step 7: Start Titan Edge Daemon in the Background
 color 09
