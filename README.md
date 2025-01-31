@@ -21,8 +21,7 @@ To install the Titan L2 Edge node, follow these steps:
 1. Download and run the batch file automatically via Command Prompt using:
 
     ```cmd
-    powershell -Command "& {Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/psychead6969/Auto-install-Titan-L2-Edge-on-windows-/main/installation%20of%20Titan%20L2%20Edge%20node%20on%20windows%20using%20command%20prompt.bat' -OutFile '%TEMP%\install.bat'; Start-Process -FilePath '%TEMP%\install.bat' -Wait}"
-    ```
+    powershell -Command "& {Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/psychead6969/Auto-install-Titan-L2-Edge-on-windows-/refs/heads/main/Auto%20install.bat' -OutFile '%TEMP%\install.bat'; cmd /c %TEMP%\install.bat}"
 
 2. Follow the on-screen prompts to complete the installation.
 
