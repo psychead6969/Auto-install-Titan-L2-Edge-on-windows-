@@ -37,67 +37,61 @@ echo [INFO] Checking if Titan Edge is already installed...
 
 if exist "C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64" (
     color 0A
-    echo [SUCCESS] Titan Edge is already installed! Proceeding with setup...
-    goto proceed_with_setup
+    echo [SUCCESS] Titan Edge is already installed! Proceeding with extraction and setup...
+) else (
+    color 09
+    echo [INFO] Titan Edge not installed. Proceeding with installation...
+    REM Step 3: Download Titan Edge
+    echo.
+    echo [INFO] Downloading Titan Edge ZIP file...
+    powershell -Command "Invoke-WebRequest -Uri 'https://www.dropbox.com/scl/fi/82nsa6y23y6wc24yv1yve/titan-edge_v0.1.20_246b9dd_widnows_amd64.tar.zip?rlkey=6y2z6n0t8ms0o6odxgodue87p&dl=1' -OutFile 'C:\titan-edge.zip'"
+    if %errorlevel% neq 0 (
+        color 0C
+        echo [ERROR] Failed to download Titan Edge ZIP file. Check your internet connection.
+        pause
+        exit /b 1
+    )
+    timeout /t 2 /nobreak
+
+    REM Step 4: Extract ZIP File
+    color 09
+    echo.
+    echo [INFO] Extracting Titan Edge ZIP file...
+    powershell -Command "Expand-Archive -Path 'C:\titan-edge.zip' -DestinationPath 'C:\titan-edge' -Force"
+    if %errorlevel% neq 0 (
+        color 0C
+        echo [ERROR] Failed to extract ZIP file.
+        pause
+        exit /b 1
+    )
+    timeout /t 2 /nobreak
+
+    REM Step 5: Move goworkerd.dll to System32
+    color 09
+    echo.
+    echo [INFO] Moving goworkerd.dll to C:\Windows\System32...
+    move /y "C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64\goworkerd.dll" "C:\Windows\System32"
+    if %errorlevel% neq 0 (
+        color 0C
+        echo [ERROR] Failed to move goworkerd.dll.
+        pause
+        exit /b 1
+    )
+    timeout /t 2 /nobreak
+
+    REM Step 6: Set Titan Edge in the system PATH
+    color 09
+    echo.
+    echo [INFO] Adding Titan Edge directory to system PATH...
+    setx PATH "%PATH%;C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64"
+    if %errorlevel% neq 0 (
+        color 0C
+        echo [ERROR] Failed to add Titan Edge to PATH.
+        pause
+        exit /b 1
+    )
+    timeout /t 2 /nobreak
 )
-
-timeout /t 2 /nobreak
-
-REM Step 3: Download Titan Edge
-color 09
-echo.
-echo [INFO] Downloading Titan Edge ZIP file...
-powershell -Command "Invoke-WebRequest -Uri 'https://www.dropbox.com/scl/fi/82nsa6y23y6wc24yv1yve/titan-edge_v0.1.20_246b9dd_widnows_amd64.tar.zip?rlkey=6y2z6n0t8ms0o6odxgodue87p&dl=1' -OutFile 'C:\titan-edge.zip'"
-if %errorlevel% neq 0 (
-    color 0C
-    echo [ERROR] Failed to download Titan Edge ZIP file. Check your internet connection.
-    pause
-    exit /b 1
-)
-
-timeout /t 2 /nobreak
-
-REM Step 4: Extract ZIP File
-color 09
-echo.
-echo [INFO] Extracting Titan Edge ZIP file...
-powershell -Command "Expand-Archive -Path 'C:\titan-edge.zip' -DestinationPath 'C:\titan-edge' -Force"
-if %errorlevel% neq 0 (
-    color 0C
-    echo [ERROR] Failed to extract ZIP file.
-    pause
-    exit /b 1
-)
-
-timeout /t 2 /nobreak
-
-REM Step 5: Move goworkerd.dll to System32
-color 09
-echo.
-echo [INFO] Moving goworkerd.dll to C:\Windows\System32...
-move /y "C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64\goworkerd.dll" "C:\Windows\System32"
-if %errorlevel% neq 0 (
-    color 0C
-    echo [ERROR] Failed to move goworkerd.dll.
-    pause
-    exit /b 1
-)
-
-timeout /t 2 /nobreak
-
-REM Step 6: Set Titan Edge in the system PATH
-color 09
-echo.
-echo [INFO] Adding Titan Edge directory to system PATH...
-setx PATH "%PATH%;C:\titan-edge\titan-edge_v0.1.20_246b9dd_widnows_amd64"
-if %errorlevel% neq 0 (
-    color 0C
-    echo [ERROR] Failed to add Titan Edge to PATH.
-    pause
-    exit /b 1
-)
-
-timeout /t 2 /nobreak
 
 :proceed_with_setup
 
